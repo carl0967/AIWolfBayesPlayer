@@ -88,7 +88,8 @@ public class TrustListManager {
 				//霊能COが一人だけなら、霊能を真と仮定して各占いとラインが繋がっているかで信用度の計算
 				if(agentInfo.countCoAgent(Role.MEDIUM)==1){
 					Species inquestedResult=utterance.getResult();
-					for(Agent voter:searchVoter(utterance.getTarget())){
+					//投票結果から計算
+					for(Agent voter:agentInfo.searchVoter(utterance.getTarget())){
 						trustList.changeVoterTrust(voter, utterance.getResult());
 					}
 					//霊媒先と一致する占い結果を探す
@@ -117,17 +118,4 @@ public class TrustListManager {
 		}
 	}
 	
-	
-	
-	/** ある人に投票した人を探す 。複数回投票したら重複してリストに入る */
-	private ArrayList<Agent> searchVoter(Agent votedAgent){
-		ArrayList<Agent> voter=new ArrayList<Agent>();
-		for(Vote vote:myRole.getLatestDayGameInfo().getVoteList()){
-			if(vote.getTarget()==votedAgent){
-				voter.add(vote.getAgent());
-			}
-		}
-		return voter;
-
-	}
 }

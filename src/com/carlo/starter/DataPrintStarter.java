@@ -63,8 +63,8 @@ public class DataPrintStarter {
 		//対戦相手クラス
 		ArrayList<Class> classes=new ArrayList<Class>();
 		classes.add(Class.forName("org.aiwolf.client.base.smpl.SampleRoleAssignPlayer"));
-		classes.add(Class.forName("com.yy.player.YYRoleAssignPlayer"));
-		classes.add(Class.forName("jp.halfmoon.inaba.aiwolf.strategyplayer.StrategyPlayer"));
+		//classes.add(Class.forName("com.yy.player.YYRoleAssignPlayer"));
+		//classes.add(Class.forName("jp.halfmoon.inaba.aiwolf.strategyplayer.StrategyPlayer"));
 
 		for(int i = 0;i<GAME_NUM;i++){
 			Map<Player, Role> playerMap = new HashMap<Player, Role>();
@@ -86,7 +86,7 @@ public class DataPrintStarter {
 			GameServer gameServer = new DirectConnectServer(playerMap);
 			GameSetting gameSetting = GameSetting.getDefaultGame(PLAYER_NUM);
 			AIWolfGame game = new AIWolfGame(gameSetting, gameServer);
-			game.setShowConsoleLog(false);
+			//game.setShowConsoleLog(false);
 
 			game.setRand(new Random(gameSetting.getRandomSeed()));
 			game.start();

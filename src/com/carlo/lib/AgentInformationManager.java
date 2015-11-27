@@ -11,10 +11,11 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 import org.aiwolf.common.data.Status;
 import org.aiwolf.common.data.Talk;
+import org.aiwolf.common.data.Vote;
 import org.aiwolf.common.net.GameInfo;
 
 /**
- *  Agentについて、死亡や役職のCO、能力結果発言などの情報を管理するクラス
+ *  Agentについて、死亡や役職のCO、能力結果発言、投票リストの情報を管理するクラス
  *  TODO:誰に投票する予定かを保持
  * @author carlo
  *
@@ -28,6 +29,8 @@ public class AgentInformationManager {
 	private HashMap<Integer,HashMap<CauseOfDeath,Agent>> deadAgentMap=new HashMap<Integer,HashMap<CauseOfDeath,Agent>>();
 	/** 各エージェントが発言した能力結果のリストのマップ */
 	private HashMap<Agent,AbilityResultList> abilityResultListMap=new HashMap<Agent,AbilityResultList>();
+	/** 各投票日ごとの投票リスト index:1が1日目の投票リスト。*/
+	private ArrayList<List<Vote>> voteLists=new ArrayList<List<Vote>>();
 	private int readTalkNum;
 	public AgentInformationManager(GameInfo gameInfo,Agent myAgent){
 		this.gameInfo=gameInfo;
@@ -51,6 +54,7 @@ public class AgentInformationManager {
 			deadAgentMap.get(yesterday).put(CauseOfDeath.EXECUTED,gameInfo.getExecutedAgent());
 			deadAgentMap.get(yesterday).put(CauseOfDeath.ATTACKED,gameInfo.getAttackedAgent());
 		}
+		if(gameInfo.getDay()!=0) voteLists.add(gameInfo.getVoteList());
 		
 	}
 	/** 死亡日、死因から死んだエージェントを取得する。なければnull */
@@ -104,6 +108,21 @@ public class AgentInformationManager {
 	public boolean isAlive(Agent agent){
 		if(gameInfo.getStatusMap().get(agent)==Status.ALIVE) return true;
 		else return false;
+	}
+	/** targetに投票したことのあるエージェントを全て探して返す。複数回投票していたら、その回数分リストに入れる。 */
+	public List<Agent> searchVoter(Agent target){
+		ArrayList<Agent> voter=new ArrayList<Agent>();
+		for(List<Vote> voteList:voteLists){
+			for(Vote vote:voteList){
+				if(vote.getTarget()==target){
+					voter.add(vote.getAgent());
+				}
+			}
+		}
+		return voter;
+	}
+	public List<List<Vote>> getVoteLists(){
+		return voteLists;
 	}
 	
 	public HashMap<Agent,AbilityResultList> getAbilityResultListMap(){
