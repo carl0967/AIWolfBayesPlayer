@@ -6,8 +6,7 @@ import org.aiwolf.common.data.Species;
 /**
  * 能力結果 <br>
  * INQUESTED,DIVINED,GUARDEDの結果情報をまとめたもの <br><br>
- * NOTE:Judgeでよくない？とは正直思った(topicが増えただけ。１つの役職をCOする前提のため、topicも特に使ってない)<br>
- * でもJudgeに狩人結果突っ込むのもなぁ...
+ * ほとんどJUDGEクラスみたいな感じ
  * @author carlo
  *
  */
@@ -16,6 +15,8 @@ public class AbilityResult {
 	private Topic topic;
 	/** その能力を実行したと思われる日付。発言した日ではない */
 	private int day;
+	/** 発言した日 */
+	private int talkedDay;
 	/** 能力行使者 */
 	private Agent agent;
 	/** 能力行使先 */
@@ -23,14 +24,17 @@ public class AbilityResult {
 	/** 結果。護衛結果では使わない */
 	private Species species;
 	
-	public AbilityResult(Topic topic,int day,Agent agent,Agent target,Species species){
+	public AbilityResult(Topic topic,int day,int talkedDay,Agent agent,Agent target,Species species){
 		this.agent=agent;
 		this.topic=topic;
 		this.day=day;
+		this.talkedDay=talkedDay;
 		this.target=target;
 		this.species=species;
 	}
-	
+	public int getTalkedDay(){
+		return talkedDay;
+	}
 	public int getDay(){
 		return day;
 	}
@@ -49,7 +53,7 @@ public class AbilityResult {
 	
 	public String toString(){
 		if(species!=null) return "day:"+day+" topic:"+topic+" target:"+target+" species:"+species;
-		else return "day:"+day+" topic:"+topic+" target:"+target;
+		else return "talkedDay:"+talkedDay+""+"day:"+day+" topic:"+topic+" target:"+target;
 	}
 
 }

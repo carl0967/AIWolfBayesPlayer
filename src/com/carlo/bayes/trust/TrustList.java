@@ -9,6 +9,7 @@ import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Judge;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
+import org.aiwolf.common.net.GameInfo;
 
 import com.carlo.bayes.lib.WekaBayesManager;
 import com.carlo.lib.AgentInformationManager;
@@ -122,6 +123,7 @@ public class TrustList {
 		if(!trustMap.containsKey(deadAgent)) return;
 		//襲撃されたらattackedネットワークから信用度を計算
 		if(cause==CauseOfDeath.ATTACKED) {
+			if(isShowConsoleLog)  System.out.println("calc trust based on dead:"+deadAgent+day+cause);
 			attackedBayes.clearAllEvidenceWithCalc();
 			//エビデンスがセットされたいない場合の確率を境界とする
 			double threshold=attackedBayes.getMarginalProbability("team", "villager");
@@ -138,13 +140,27 @@ public class TrustList {
 	}
 	public void printTrustList(){
 		if(isShowConsoleLog){
-			System.out.println("Agent[番号]\t信用度\t生存\tCO");
+			System.out.println("\nAgent[番号]\t信用度\t生存\tCO");
 			for(Entry<Agent, Double> entry : trustMap.entrySet()) {
 				System.out.print(entry.getKey()+"\t");
 				System.out.printf("%.3f",entry.getValue());
 				System.out.print("\t"+agentInfo.isAlive(entry.getKey()));
 				System.out.println("\t"+agentInfo.getCoRole(entry.getKey()));
 			}
+			System.out.println();
+		}
+	}
+	public void printTrustList(GameInfo finishedGameInfo){
+		if(isShowConsoleLog){
+			System.out.println("\nAgent[番号]\t信用度\t生存\tCO\t役職");
+			for(Entry<Agent, Double> entry : trustMap.entrySet()) {
+				System.out.print(entry.getKey()+"\t");
+				System.out.printf("%.3f",entry.getValue());
+				System.out.print("\t"+agentInfo.isAlive(entry.getKey()));
+				System.out.print("\t"+agentInfo.getCoRole(entry.getKey()));
+				System.out.println("\t"+finishedGameInfo.getRoleMap().get(entry.getKey()));
+			}
+			System.out.println();
 		}
 	}
 	/**
@@ -161,8 +177,8 @@ public class TrustList {
 	 * @param reverse 逆の計算をするかどうか。通常はfalse
 	 */
 	public void changeSeerTrust(Agent agent,int day,Species species,Correct correct,boolean reverse){
+		if(isShowConsoleLog)  System.out.print("calc trust based on seer:");
 		if(isShowConsoleLog) System.out.println(agent+" day:"+day+" species:"+species+" correct:"+correct+" reverse:"+reverse);
-		if(isShowConsoleLog)  System.out.print("seer  ");
 		
 		if(!trustMap.containsKey(agent)) return;
 		seerBayes.clearAllEvidence();
@@ -185,8 +201,8 @@ public class TrustList {
 	 * @param targetSpecies 投票先の種族
 	 */
 	public void changeVoterTrust(Agent agent,Species targetSpecies){
-		if(isShowConsoleLog) System.out.print("vote");
 		if(!trustMap.containsKey(agent)) return;
+		if(isShowConsoleLog) System.out.println("calc trust based on vote "+agent+"target:"+targetSpecies);
 		voterBayes.clearAllEvidenceWithCalc();
 		double threshold=voterBayes.getMarginalProbability("user_s","human");
 		voterBayes.setEvidence("target_s",BayesConverter.convert(targetSpecies));
@@ -212,7 +228,7 @@ public class TrustList {
 		if(reverse) result=addTrust(agent,-point);
 		else result=addTrust(agent,point);
 		if(isShowConsoleLog){
-			System.out.print(agent);
+			System.out.print(""+agent);
 			if(reverse) System.out.printf("%.2f-%.2f(%.2f-%.2f)=%.2f\n",pre,point,margin,threshold,result);
 			else System.out.printf("%.2f+%.2f(%.2f-%.2f)=%.2f\n",pre,point,margin,threshold,result);
 		}

@@ -28,8 +28,8 @@ public class TrustListManager {
 	private AbstractRole myRole;
 	private int readTalkNum=0;
 	
-	/**  コンソール出力,この設定がTrustListに反映される */
-	private boolean isShowConsoleLog=false;
+	/**  コンソール出力。この設定がTrustListにも反映される。on,offはここでいじる。 */
+	private boolean isShowConsoleLog=true;
 	public TrustListManager(List<Agent> agentList,AbstractRole myRole,AgentInformationManager agentInfo){
 		this.agentInfo=agentInfo;
 		this.myRole=myRole;
@@ -55,6 +55,9 @@ public class TrustListManager {
 	}
 	public void printTrustList(){
 		if(isShowConsoleLog) trustList.printTrustList();
+	}
+	public void printTrustList(GameInfo finishedGameInfo){
+		if(isShowConsoleLog) trustList.printTrustList(finishedGameInfo);
 	}
 	
 	/**
@@ -88,26 +91,22 @@ public class TrustListManager {
 					for(Agent voter:searchVoter(utterance.getTarget())){
 						trustList.changeVoterTrust(voter, utterance.getResult());
 					}
-					if(isShowConsoleLog) System.out.println("see line------");
 					//霊媒先と一致する占い結果を探す
 					for(AbilityResult abilityResult:AIMAssister.searchDivinedAgent(agentInfo, utterance.getTarget())){
 						//まず前回の結果を戻す
 						
-						//TODO:dayの不一致なので直す。AbilityResultとtalkのday
-						if(isShowConsoleLog) System.out.println(abilityResult.getDay()+"day agent:"+abilityResult.getAgent()+" target:"+abilityResult.getTarget());
-						trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getDay(), abilityResult.getSpecies(), Correct.UNKNOWN,true);
+						if(isShowConsoleLog) System.out.println("back trust ");
+						trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getTalkedDay(), abilityResult.getSpecies(), Correct.UNKNOWN,true);
 						
 						//判明した結果を入れて計算
 						Correct correct=Correct.UNKNOWN;
 						if(inquestedResult==abilityResult.getSpecies()) correct=Correct.YES;
 						else correct=Correct.NO;
 						
-						if(isShowConsoleLog) System.out.println("re calc correct:"+correct +"result:" +abilityResult.getSpecies());
-						trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getDay(), abilityResult.getSpecies(), correct);
+						if(isShowConsoleLog) System.out.println("recalc trust ");
+						trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getTalkedDay(), abilityResult.getSpecies(), correct);
 						
 					}
-					if(isShowConsoleLog) System.out.println("--------");
-					//1日目の占い結果で信用度計算→その占い結果の霊結果で信用度計算、とだぶるためしっかりやるなら対処が必要
 				}
 				break;
 			default:

@@ -56,7 +56,7 @@ public class BayesVillager extends AbstractVillager {
 
 	@Override
 	public void finish() {
-		trustListManager.printTrustList();
+		trustListManager.printTrustList(getLatestDayGameInfo());
 	}
 
 	@Override

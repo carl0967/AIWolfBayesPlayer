@@ -127,15 +127,15 @@ public class AgentInformationManager {
 				break;
 			case DIVINED:
 				if(coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.SEER);
-				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1, speaker,utterance.getTarget(),utterance.getResult());
+				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1,talk.getDay(), speaker,utterance.getTarget(),utterance.getResult());
 				break;
 			case INQUESTED:
 				if(coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.MEDIUM);
-				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1, speaker,utterance.getTarget(),utterance.getResult());
+				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1,talk.getDay(), speaker,utterance.getTarget(),utterance.getResult());
 				break;
 			case GUARDED:
 				if(coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.BODYGUARD);
-				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1,speaker,utterance.getTarget(),utterance.getResult());
+				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1,talk.getDay(),speaker,utterance.getTarget(),utterance.getResult());
 				break;
 			default:
 				break;

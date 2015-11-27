@@ -32,7 +32,7 @@ public class MyStarter {
 	/**
 	 * 1回の実行で行うゲーム数
 	 */
-	static protected int GAME_NUM = 100;
+	static protected int GAME_NUM = 1;
 
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 		//村人側勝利数
@@ -45,11 +45,7 @@ public class MyStarter {
 
 			for(int j=0;j<PLAYER_NUM;j++){
 				//playerList.add(new KajiRoleAssignPlayer()); //ここで作成したエージェントを指定
-				//if(j%2==0) playerList.add(new YanagimatiRoleAssignPlayer());
-				//else playerList.add(new KajiRoleAssignPlayer());
-				//playerList.add(new YYRoleAssignPlayer());
 				playerList.add(new BayesPlayer());
-				//playerList.add(new TestPlayer());
 			}
 			
 
@@ -57,7 +53,7 @@ public class MyStarter {
 			GameSetting gameSetting = GameSetting.getDefaultGame(PLAYER_NUM);
 
 			AIWolfGame game = new AIWolfGame(gameSetting, gameServer);
-			game.setShowConsoleLog(false);
+			//game.setShowConsoleLog(false);
 			
 			//ログ
 			/*
