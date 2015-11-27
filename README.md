@@ -9,3 +9,8 @@
 
 [Wekaについて等はこちらのブログを参考に](http://informationstudent.blog.fc2.com/blog-entry-26.html "WekaのEditableBayesNetを使いやすくするクラスを作成")
 
+**使用しているネットワーク**
+* attacked2.xml -襲撃された人物が、村人陣営かどうか
+* newvote2.xml  -<人狼,村人>に投票した人物が、村人陣営かどうか 。
+* seer.xml    -<人狼,村人>判定を下した占い師が、真占い師かどうか。真霊能がほぼ確定している場合、結果が一致しているかも踏まえる。  
+
