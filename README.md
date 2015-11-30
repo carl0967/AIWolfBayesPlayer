@@ -8,7 +8,7 @@
 正直ベイジアンネットワークというほどネットワークが複雑ではありません。条件付き確率を利用してるだけレベルです。  
 
 
-[Wekaについて等はこちらのブログを参考に](http://informationstudent.blog.fc2.com/blog-entry-26.html "WekaのEditableBayesNetを使いやすくするクラスを作成")
+[開発者のブログです。](http://informationstudent.blog.fc2.com/blog-entry-28.html "開発者のブログ")weka.jarの入手について等はこちらを参考にしてください。  
 
 **使用しているベイジアンネットワーク**
 * attacked2.xml -襲撃された人物が、村人陣営の確率
