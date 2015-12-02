@@ -2,15 +2,9 @@ package com.carlo.bayes.player;
 
 import org.aiwolf.client.base.player.AbstractRoleAssignPlayer;
 import org.aiwolf.client.base.smpl.*;
-
-import com.yy.player.YYBodyguard;
-import com.yy.player.YYMedium;
-import com.yy.player.YYPossessed;
-import com.yy.player.YYSeer;
-import com.yy.player.YYVillager;
-import com.yy.player.YYWerewolf;
 /**
  *  ベイジアンネットワークを利用して作成したエージェント
+ *  村人,狩人のみ簡単に実装
  * @author carlo
  *
  */
