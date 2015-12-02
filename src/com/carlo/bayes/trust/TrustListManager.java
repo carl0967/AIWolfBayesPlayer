@@ -29,7 +29,7 @@ public class TrustListManager {
 	private int readTalkNum=0;
 	
 	/**  コンソール出力。この設定がTrustListにも反映される。on,offはここでいじる。 */
-	private boolean isShowConsoleLog=true;
+	private boolean isShowConsoleLog=false;
 	public TrustListManager(List<Agent> agentList,AbstractRole myRole,AgentInformationManager agentInfo){
 		this.agentInfo=agentInfo;
 		this.myRole=myRole;
@@ -52,6 +52,13 @@ public class TrustListManager {
 	/** 信用度が最低で生存しているエージェントを返す */
 	public Agent getLowestTrustAliveAgent(){
 		return trustList.getLowestTrustAgent();
+	}
+	/** 信用度が最高で生存している、指定の役職をCOしているエージェントを返す */
+	public Agent getHighestTrustRoleCOAgent(Role role){
+		return trustList.getHighestTrustRoleCOAgent(role);
+	}
+	public Agent getHighestTrustAliveAgent(){
+		return trustList.getHighestTrustAliveAgent();
 	}
 	public void printTrustList(){
 		if(isShowConsoleLog) trustList.printTrustList();

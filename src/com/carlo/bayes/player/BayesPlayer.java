@@ -1,6 +1,7 @@
 package com.carlo.bayes.player;
 
 import org.aiwolf.client.base.player.AbstractRoleAssignPlayer;
+import org.aiwolf.client.base.smpl.*;
 
 import com.yy.player.YYBodyguard;
 import com.yy.player.YYMedium;
@@ -16,13 +17,13 @@ import com.yy.player.YYWerewolf;
 public class BayesPlayer extends AbstractRoleAssignPlayer {
 	public BayesPlayer(){
 		setVillagerPlayer(new BayesVillager());
-		/*
-		setSeerPlayer(new YYSeer());
-		setBodyguardPlayer(new YYBodyguard());
-		setMediumPlayer(new YYMedium());
-		setWerewolfPlayer(new YYWerewolf());
-		setPossessedPlayer(new YYPossessed());
-		*/
+		setBodyguardPlayer(new BayesBodyguard());
+		
+		setSeerPlayer(new SampleSeer());
+		setMediumPlayer(new SampleMedium());
+		setWerewolfPlayer(new SampleWerewolf());
+		setPossessedPlayer(new SamplePossessed());
+		
 	}
 
 	@Override

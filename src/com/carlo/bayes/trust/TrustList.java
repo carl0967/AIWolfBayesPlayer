@@ -55,11 +55,38 @@ public class TrustList {
 	}
 	public Agent getLowestTrustAgent(){
 		Agent tmpAgent=null;
-		double tmpTrustP=100;
+		double tmpTrustP=101;
 		for(Entry<Agent, Double> entry : trustMap.entrySet()) {
 			if(entry.getValue()<tmpTrustP){
 				tmpAgent=entry.getKey();
 				tmpTrustP=entry.getValue();
+			}
+		}
+		return tmpAgent;
+	}
+	/**  */
+	public Agent getHighestTrustRoleCOAgent(Role role){
+		Agent tmpAgent=null;
+		double tmpTrustP=-1;
+		
+		for(Agent agent:agentInfo.getCoAgentList(role)){
+			if(agentInfo.isAlive(agent) && trustMap.get(agent)>tmpTrustP){
+				tmpAgent=agent;
+				tmpTrustP=trustMap.get(agent);
+			}
+		}
+		return tmpAgent;
+	}
+	public Agent getHighestTrustAliveAgent(){
+		Agent tmpAgent=null;
+		double tmpTrustP=-1;
+		for(Entry<Agent, Double> entry : trustMap.entrySet()) {
+			Agent agent=entry.getKey();
+			if(agentInfo.isAlive(agent)){
+				if(entry.getValue()>tmpTrustP){
+					tmpAgent=entry.getKey();
+					tmpTrustP=entry.getValue();
+				}
 			}
 		}
 		return tmpAgent;
