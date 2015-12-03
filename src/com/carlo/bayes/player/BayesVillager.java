@@ -20,6 +20,7 @@ import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
 import com.carlo.bayes.trust.DataCorrecter;
+import com.carlo.bayes.trust.TrustLevel;
 import com.carlo.bayes.trust.TrustListManager;
 import com.carlo.lib.AgentInformationManager;
 import com.carlo.lib.CauseOfDeath;
@@ -66,13 +67,13 @@ public class BayesVillager extends AbstractVillager {
 
 	@Override
 	public Agent vote() {
-		return trustListManager.getLowestTrustAliveAgent();
+		return trustListManager.getAgent(TrustLevel.LOWEST, true);
 	}
 	
 	/** 性能テスト用 */
 	public int getCorrectNum(){
 		DataCorrecter dataCorrecter=new DataCorrecter(getMe());
-		return dataCorrecter.start(trustListManager.getSortedList(), getLatestDayGameInfo());
+		return dataCorrecter.start(trustListManager.getSortedAgentList(false), getLatestDayGameInfo());
 	}
 
 

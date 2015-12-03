@@ -1,5 +1,6 @@
 package com.carlo.lib;
 
+
 /** 死因 */
 public enum CauseOfDeath{
 	/** 襲撃 */

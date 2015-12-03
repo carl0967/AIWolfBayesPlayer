@@ -53,90 +53,61 @@ public class TrustList {
 		voterBayes=new WekaBayesManager("xml/newvote2.xml");
 		attackedBayes=new WekaBayesManager("xml/attacked2.xml");
 	}
-	public Agent getLowestTrustAgent(){
-		Agent tmpAgent=null;
-		double tmpTrustP=101;
-		for(Entry<Agent, Double> entry : trustMap.entrySet()) {
-			if(entry.getValue()<tmpTrustP){
-				tmpAgent=entry.getKey();
-				tmpTrustP=entry.getValue();
-			}
-		}
-		return tmpAgent;
-	}
-	/**  */
-	public Agent getHighestTrustRoleCOAgent(Role role){
-		Agent tmpAgent=null;
-		double tmpTrustP=-1;
-		
-		for(Agent agent:agentInfo.getCoAgentList(role)){
-			if(agentInfo.isAlive(agent) && trustMap.get(agent)>tmpTrustP){
-				tmpAgent=agent;
-				tmpTrustP=trustMap.get(agent);
-			}
-		}
-		return tmpAgent;
-	}
-	public Agent getHighestTrustAliveAgent(){
-		Agent tmpAgent=null;
-		double tmpTrustP=-1;
-		for(Entry<Agent, Double> entry : trustMap.entrySet()) {
-			Agent agent=entry.getKey();
-			if(agentInfo.isAlive(agent)){
-				if(entry.getValue()>tmpTrustP){
-					tmpAgent=entry.getKey();
-					tmpTrustP=entry.getValue();
-				}
-			}
-		}
-		return tmpAgent;
-	}
+
+
 	/**
-	 * 　信頼度が低い順にエージェントを入れて返す
-	 * @return
+	 *  
+	 * @param coRole COした役職。nullならCOがない人を対象に。
+	 * @param isAliveOnly true:生存者のみ。false:生存・非生存問わない
+	 * @return 信用度が低い順にソートされたAgentのList
+	 * 必要
 	 */
-	public List<Agent> getSortedList(){
-		List<Agent> sortedAgent=new ArrayList<Agent>();
-		List<Double> sortedScore=new ArrayList<Double>();
-		for(Entry<Agent, Double> entry : trustMap.entrySet()) {
-			if(sortedAgent.size()==0){
-				sortedAgent.add(entry.getKey());
-				sortedScore.add(entry.getValue());
-			}
+	public List<Agent> getSortedRoleCOAgentList(Role coRole,boolean isAliveOnly){
+		List<Agent> sortedAgentList=new ArrayList<Agent>();
+
+		for(Agent agent:agentInfo.getCoAgentList(coRole,isAliveOnly)){
+			if(sortedAgentList.size()==0) sortedAgentList.add(agent);
 			else{
-				boolean add=false;
-				for(int i=0;i<sortedAgent.size();i++){
-					if(entry.getValue()<sortedScore.get(i)){
-						sortedAgent.add(i, entry.getKey());
-						sortedScore.add(i, entry.getValue());
-						add=true;
+				int i=0;
+				for(Agent sortedAgent :sortedAgentList){
+					if(trustMap.get(agent)<trustMap.get(sortedAgent)){
+						sortedAgentList.add(i, agent);
 						break;
 					}
+					i++;
 				}
-				if(add==false){
-					sortedAgent.add(entry.getKey());
-					sortedScore.add(entry.getValue());
-				}
+				if(!sortedAgentList.contains(agent)) sortedAgentList.add(agent);
 			}
 		}
-		return sortedAgent;
+		return sortedAgentList;
+	}
+	/**
+	 * 
+	 * @param isAliveOnly
+	 * @return
+	 */
+	public List<Agent> getSortedAgentList(boolean isAliveOnly){
+		List<Agent> sortedAgentList=new ArrayList<Agent>();
 
-	}
-	/** もっとも信用してない生きているエージェントを返す。 */
-	public Agent getLowestTrustAliveAgent(){
-		Agent tmpAgent=null;
-		double tmpTrustP=100;
-		for(Entry<Agent, Double> entry : trustMap.entrySet()) {
-			Agent agent=entry.getKey();
-			if(agentInfo.isAlive(agent)){
-				if(entry.getValue()<tmpTrustP){
-					tmpAgent=entry.getKey();
-					tmpTrustP=entry.getValue();
+		for(Agent agent:agentInfo.getAgentList(isAliveOnly)){
+			if(sortedAgentList.size()==0) sortedAgentList.add(agent);
+			else{
+				int i=0;
+				for(Agent sortedAgent :sortedAgentList){
+					if(trustMap.get(agent)<trustMap.get(sortedAgent)){
+						sortedAgentList.add(i, agent);
+						break;
+					}
+					i++;
 				}
+				if(!sortedAgentList.contains(agent)) sortedAgentList.add(agent);
 			}
 		}
-		return tmpAgent;
+		return sortedAgentList;
 	}
+
+
+
 	public double getTrustPoint(Agent agent){
 		return trustMap.get(agent);
 	}

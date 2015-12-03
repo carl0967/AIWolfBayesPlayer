@@ -7,6 +7,7 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
+import com.carlo.bayes.trust.TrustLevel;
 import com.carlo.bayes.trust.TrustListManager;
 import com.carlo.lib.AgentInformationManager;
 
@@ -48,12 +49,12 @@ public class BayesBodyguard extends AbstractBodyguard {
 
 	@Override
 	public Agent vote() {
-		return trustListManager.getLowestTrustAliveAgent();
+		return trustListManager.getAgent(TrustLevel.LOWEST, true);
 	}
 	@Override
 	public Agent guard() {
-		Agent agent=trustListManager.getHighestTrustRoleCOAgent(Role.SEER);
-		if(agent==null) agent=trustListManager.getHighestTrustAliveAgent();
+		Agent agent=trustListManager.getRoleCOAgent(TrustLevel.HIGHEST, Role.SEER, false);
+		if(agentInfo.isAlive(agent)==false) agent=trustListManager.getRoleCOAgent(TrustLevel.HIGHEST, null, true);
 		return agent;
 	}
 

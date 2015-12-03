@@ -32,6 +32,7 @@ public class AgentInformationManager {
 	/** 各投票日ごとの投票リスト index:1が1日目の投票リスト。*/
 	private ArrayList<List<Vote>> voteLists=new ArrayList<List<Vote>>();
 	private int readTalkNum;
+	
 	public AgentInformationManager(GameInfo gameInfo,Agent myAgent){
 		this.gameInfo=gameInfo;
 		for(Agent agent:gameInfo.getAgentList()){
@@ -68,11 +69,38 @@ public class AgentInformationManager {
 	public Role getCoRole(Agent agnet){
 		return coRoleMap.get(agnet);
 	}
-	/** 役職roleをCOしたエージェントのリストを返す */
-	public List<Agent> getCoAgentList(Role role){
+	/**
+	 * 
+	 * @param coRole COした役職。nullならCOがない人を対象に。 
+	 * @param isAliveOnly 生存しているエージェントのみを対象とするか
+	 * @return  条件に合うエージェントのリストを返す
+	 */
+	public List<Agent> getCoAgentList(Role coRole,boolean isAliveOnly){
 		ArrayList<Agent> agents=new ArrayList<Agent>();
 		for(Entry<Agent, Role> entry : coRoleMap.entrySet()) {
-			if(entry.getValue()==role) agents.add(entry.getKey());
+			if(isAliveOnly){
+				if(isAlive(entry.getKey()) && entry.getValue()==coRole) agents.add(entry.getKey());
+			}
+			else{
+				if(entry.getValue()==coRole) agents.add(entry.getKey());
+			}
+		}
+		return agents;
+	}
+	/**
+	 * 
+	 * @param isAliveOnly 生存しているエージェントのみを対象とするか
+	 * @return 条件に合うエージェントのリストを返す
+	 */
+	public List<Agent> getAgentList(boolean isAliveOnly){
+		ArrayList<Agent> agents=new ArrayList<Agent>();
+		for(Entry<Agent, Role> entry : coRoleMap.entrySet()) {
+			if(isAliveOnly){
+				if(isAlive(entry.getKey())) agents.add(entry.getKey());
+			}
+			else{
+				 agents.add(entry.getKey());
+			}
 		}
 		return agents;
 	}

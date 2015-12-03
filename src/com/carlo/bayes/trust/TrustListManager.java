@@ -45,21 +45,54 @@ public class TrustListManager {
 		readTalkList();
 	}
 	
-	/** 信用度が低い順にソートされたリストを返す */
-	public List<Agent> getSortedList(){
-		return trustList.getSortedList();
+	/**
+	 * 
+	 * @param  trustLevel 信用度の高さ。Highest or Lowest
+	 * @param isAliveOnly 生存しているエージェントのみを対象とするか
+	 * @return 条件に合うAgentを返す
+	 */
+	public Agent getAgent(TrustLevel  trustLevel,boolean isAliveOnly){
+		List<Agent> sortedList= trustList.getSortedAgentList(isAliveOnly);
+		if(sortedList.size()==0) return null;
+		
+		if(trustLevel==TrustLevel.LOWEST) return sortedList.get(0);
+		else if(trustLevel==TrustLevel.HIGHEST) return sortedList.get(sortedList.size()-1);
+		return null;
 	}
-	/** 信用度が最低で生存しているエージェントを返す */
-	public Agent getLowestTrustAliveAgent(){
-		return trustList.getLowestTrustAgent();
+	/**
+	 * 
+	 * @param  trustLevel 信用度の高さ。Highest or Lowest
+	 * @param coRole COした役職。nullならCOがない人を対象に。
+	 * @param isAliveOnly 生存しているエージェントのみを対象とするか
+	 * @return 条件に合うAgentを返す
+	 */
+	public Agent getRoleCOAgent(TrustLevel trustLevel,Role coRole,boolean isAliveOnly){
+		List<Agent> sortedList= trustList.getSortedRoleCOAgentList(coRole, isAliveOnly);
+		if(sortedList.size()==0) return null;
+		
+		if(trustLevel==TrustLevel.LOWEST) return sortedList.get(0);
+		else if(trustLevel==TrustLevel.HIGHEST) return sortedList.get(sortedList.size()-1);
+		return null;
 	}
-	/** 信用度が最高で生存している、指定の役職をCOしているエージェントを返す */
-	public Agent getHighestTrustRoleCOAgent(Role role){
-		return trustList.getHighestTrustRoleCOAgent(role);
+	
+	/**
+	 * @param coRole COした役職。nullならCOがない人を対象に。
+	 * @param isAliveOnly 生存しているエージェントのみを対象とするか
+	 * @return 信用度が低い順にソートされたAgentのList
+	 */
+	public List<Agent> getSortedRoleCOAgentList(Role coRole,boolean isAliveOnly){
+		return trustList.getSortedRoleCOAgentList(coRole,isAliveOnly);
 	}
-	public Agent getHighestTrustAliveAgent(){
-		return trustList.getHighestTrustAliveAgent();
+	/**
+	 * @param isAliveOnly 生存しているエージェントのみを対象とするか
+	 * @return 信用度が低い順にソートされたAgentのList
+	 */
+	public List<Agent> getSortedAgentList(boolean isAliveOnly){
+		return trustList.getSortedAgentList(isAliveOnly);
 	}
+	
+
+	
 	public void printTrustList(){
 		if(isShowConsoleLog) trustList.printTrustList();
 	}
