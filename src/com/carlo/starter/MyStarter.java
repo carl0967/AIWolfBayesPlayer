@@ -32,7 +32,7 @@ public class MyStarter {
 	/**
 	 * 1回の実行で行うゲーム数
 	 */
-	static protected int GAME_NUM = 1;
+	static protected int GAME_NUM = 1000;
 
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 		//村人側勝利数
@@ -53,10 +53,10 @@ public class MyStarter {
 			GameSetting gameSetting = GameSetting.getDefaultGame(PLAYER_NUM);
 
 			AIWolfGame game = new AIWolfGame(gameSetting, gameServer);
-			//game.setShowConsoleLog(false);
+			game.setShowConsoleLog(false);
 			
 			//ログ
-			/*
+			
 		    String timeString = CalendarTools.toDateTime(System.currentTimeMillis()).replaceAll("[\\s-/:]", "");
 			File logFile = new File(String.format("%s/aiwolfGame%s_%d.log", "./log/", timeString,villagerWinNum+werewolfWinNum));
 			try {
@@ -64,7 +64,7 @@ public class MyStarter {
 			} catch (IOException e) {
 				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
-			}*/
+			}
 
 
 

@@ -2,6 +2,7 @@ package com.carlo.starter;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,14 +41,13 @@ public class DataPrintStarter {
 	 * 参加エージェントの数
 	 * 大会は15
 	 * 10人で全役職あり
-	 * ベイジアンネットワーク生成のためのデータが8,9人全役職なので、近めの10人で
 	 */
-	static protected int PLAYER_NUM = 10;
+	static protected int PLAYER_NUM = 15;
 
 	/**
 	 * 1回の実行で行うゲーム数
 	 */
-	static protected int GAME_NUM = 1;
+	static protected int GAME_NUM = 1000;
 
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 		//村人側勝利数
@@ -63,21 +63,40 @@ public class DataPrintStarter {
 		//対戦相手クラス
 		ArrayList<Class> classes=new ArrayList<Class>();
 		classes.add(Class.forName("org.aiwolf.client.base.smpl.SampleRoleAssignPlayer"));
-		//classes.add(Class.forName("com.yy.player.YYRoleAssignPlayer"));
-		//classes.add(Class.forName("jp.halfmoon.inaba.aiwolf.strategyplayer.StrategyPlayer"));
+		classes.add(Class.forName("com.yy.player.YYRoleAssignPlayer"));
+		classes.add(Class.forName("jp.halfmoon.inaba.aiwolf.strategyplayer.StrategyPlayer"));
+		classes.add(Class.forName("org.aiwolf.kajiClient.LearningPlayer.KajiRoleAssignPlayer"));
+		classes.add(Class.forName("com.gmail.jinro.noppo.players.RoleAssignPlayer"));
+		classes.add(Class.forName("org.aiwolf.Satsuki.LearningPlayer.AIWolfMain"));
+		classes.add(Class.forName("jp.ac.shibaura_it.ma15082.WasabiRoleAssignPlayer"));
+		classes.add(Class.forName("takata.player.TakataRoleAssignPlayer"));
+		classes.add(Class.forName("ipa.myAgent.IPARoleAssignPlayer"));
+		//classes.add(Class.forName(className));
+		
+		
+		//ファイル出力
+		PrintStream out = new PrintStream("result10.arff");
+        //置き換える
+        System.setOut(out);
 
 		for(int i = 0;i<GAME_NUM;i++){
 			Map<Player, Role> playerMap = new HashMap<Player, Role>();
+			
 			for(int j=0;j<PLAYER_NUM-1;j++){
-				/*
+				
 				 //ランダムで追加
 				int rnd=new Random().nextInt(classes.size());
 				playerMap.put((Player) classes.get(rnd).newInstance(), null);
-				*/
+				
 				//playerMap.put(new SampleRoleAssignPlayer(), null);
-				playerMap.put(new YYRoleAssignPlayer(), null);
+				//playerMap.put(new YYRoleAssignPlayer(), null);
 				//playerMap.put(new StrategyPlayer(), null);
 			}
+		
+			//playerMap.put(new SampleRoleAssignPlayer(), null);
+			//playerMap.put(new YYRoleAssignPlayer(), null);	
+			
+				
 			BayesPlayer myPlayer=new BayesPlayer();
 			//RandomPlayer myPlayer=new RandomPlayer();
 			//myPlayerは村人指定
@@ -86,12 +105,13 @@ public class DataPrintStarter {
 			GameServer gameServer = new DirectConnectServer(playerMap);
 			GameSetting gameSetting = GameSetting.getDefaultGame(PLAYER_NUM);
 			AIWolfGame game = new AIWolfGame(gameSetting, gameServer);
-			//game.setShowConsoleLog(false);
+			game.setShowConsoleLog(false);
 
 			game.setRand(new Random(gameSetting.getRandomSeed()));
 			game.start();
 
-			int tmpCorrect=myPlayer.getCorrectNum();
+			//int tmpCorrect=myPlayer.getCorrectNum();
+			int tmpCorrect=0;
 			if(tmpCorrect!=-1){
 				correct+=tmpCorrect;
 				max+=3;
@@ -104,7 +124,7 @@ public class DataPrintStarter {
 			}
 
 		}
-		System.out.println("正答数"+correct+"/"+max);
-		System.out.println("村人側勝利:" + villagerWinNum + " 人狼側勝利：" + werewolfWinNum);
+		//System.out.println("正答数"+correct+"/"+max);
+		//System.out.println("村人側勝利:" + villagerWinNum + " 人狼側勝利：" + werewolfWinNum);
 	}
 }

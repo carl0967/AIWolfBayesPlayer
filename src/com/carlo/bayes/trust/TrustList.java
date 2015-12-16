@@ -11,15 +11,12 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
 import org.aiwolf.common.net.GameInfo;
 
+import com.carlo.arffmaker.BayesConverter15;
 import com.carlo.bayes.lib.WekaBayesManager;
 import com.carlo.lib.AgentInformationManager;
 import com.carlo.lib.CauseOfDeath;
 
-enum  Correct{
-	YES,
-	NO,
-	UNKNOWN
-}
+
 /**
  * 各Agentに対する信用度のリスト
  * @author carlo
@@ -49,9 +46,9 @@ public class TrustList {
 		}
 
 		//
-		seerBayes=new WekaBayesManager("xml/seer.xml");
-		voterBayes=new WekaBayesManager("xml/newvote2.xml");
-		attackedBayes=new WekaBayesManager("xml/attacked2.xml");
+		seerBayes=new WekaBayesManager("xml/newseer4.xml");
+		voterBayes=new WekaBayesManager("xml/newvote3_1.xml");
+		attackedBayes=new WekaBayesManager("xml/newattacked1.xml");
 	}
 
 
@@ -124,15 +121,16 @@ public class TrustList {
 			if(isShowConsoleLog)  System.out.println("calc trust based on dead:"+deadAgent+day+cause);
 			attackedBayes.clearAllEvidenceWithCalc();
 			//エビデンスがセットされたいない場合の確率を境界とする
-			double threshold=attackedBayes.getMarginalProbability("team", "villager");
+			double threshold=attackedBayes.getMarginalProbability("team", "VILLAGER");
 			
-			attackedBayes.setEvidence("attacked","yes");
+			attackedBayes.setEvidence("attacked","true");
 			Role deadCoRole=agentInfo.getCoRole(deadAgent);
-			String convertRole=BayesConverter.convert(deadCoRole);
+			//nullのことを考えてconvert
+			String convertRole=BayesConverter15.convertRole(deadCoRole);
 			attackedBayes.setEvidence("corole",convertRole);
 			attackedBayes.calcMargin();
 			
-			double margin=attackedBayes.getMarginalProbability("team", "villager");
+			double margin=attackedBayes.getMarginalProbability("team", "VILLAGER");
 			changeTrust(deadAgent,margin,threshold,false);
 		}
 	}
@@ -161,6 +159,29 @@ public class TrustList {
 			System.out.println();
 		}
 	}
+	public void printTrustListForCreatingData(GameInfo finishedGameInfo){
+		//System.out.println("\n信用度,CO,役職,占いCO数,霊能CO数");
+		for(Entry<Agent, Double> entry : trustMap.entrySet()) {
+			//System.out.print(entry.getKey()+",");
+			//System.out.print(agentInfo.getDayAgentDied(agentInfo.getMyAgent()));
+			double trustP=entry.getValue();
+			String label="";
+			if(trustP<25)  label="low";
+			else if(trustP<45) label="little_low";
+			else if(trustP<55) label="middle";
+			else if(trustP<75) label="little_high";
+			else label="high";
+			System.out.print(""+label);
+			//System.out.printf(",%.3f",entry.getValue());
+			System.out.print(","+agentInfo.getCoRole(entry.getKey()));
+			System.out.print(","+finishedGameInfo.getRoleMap().get(entry.getKey()));
+			System.out.print(","+agentInfo.countCoAgent(Role.SEER));
+			System.out.println(","+agentInfo.countCoAgent(Role.MEDIUM));
+			//System.out.println(","+agentInfo.getDayAgentDied(entry.getKey()));
+		}
+		//System.out.println();
+
+	}
 	/**
 	 *  占い発言から信用度計算
 	 * @param agent 占い師
@@ -180,16 +201,16 @@ public class TrustList {
 		
 		if(!trustMap.containsKey(agent)) return;
 		seerBayes.clearAllEvidence();
-		seerBayes.setEvidence("day", BayesConverter.convert(day));
+		seerBayes.setEvidence("day", BayesConverter15.convertDay(day));
 		seerBayes.calcMargin();
 		//閾値。エビデンスを与えた場合にこれをどれだけ上回るか下回るかで信用度を上下させる
-		double threshold=seerBayes.getMarginalProbability("seer_role", "seer");
+		double threshold=seerBayes.getMarginalProbability("role", "SEER");
 		
-		seerBayes.setEvidence("species",BayesConverter.convert(species));
-		if(correct!=Correct.UNKNOWN) seerBayes.setEvidence("correct", BayesConverter.convert(correct));
+		seerBayes.setEvidence("result",species.toString());
+		if(correct!=Correct.UNKNOWN) seerBayes.setEvidence("correct", BayesConverter15.convert(correct));
 		seerBayes.calcMargin();
 		
-		double margin=seerBayes.getMarginalProbability("seer_role", "seer");
+		double margin=seerBayes.getMarginalProbability("role", "SEER");
 		//信用度の変化
 		changeTrust(agent,margin,threshold,reverse);
 	}
@@ -197,15 +218,21 @@ public class TrustList {
 	 *  投票結果から信用度計算
 	 * @param agent 投票者
 	 * @param targetSpecies 投票先の種族
+	 * @param day 投票日
+	 * @param assist  booleanをstringにしたもの
+	 * TODO:booleanを引数にして、こっちでStringにするべきかも
 	 */
-	public void changeVoterTrust(Agent agent,Species targetSpecies){
+	public void changeVoterTrust(Agent agent,Species targetSpecies,int day,String assist){
 		if(!trustMap.containsKey(agent)) return;
 		if(isShowConsoleLog) System.out.println("calc trust based on vote "+agent+"target:"+targetSpecies);
 		voterBayes.clearAllEvidenceWithCalc();
-		double threshold=voterBayes.getMarginalProbability("user_s","human");
-		voterBayes.setEvidence("target_s",BayesConverter.convert(targetSpecies));
+		voterBayes.setEvidence("day",BayesConverter15.convertDay(day));
+		
+		double threshold=voterBayes.getMarginalProbability("voter","human");
+		if(targetSpecies!=null) voterBayes.setEvidence("target",BayesConverter.convert(targetSpecies));
+		if(assist!=null) voterBayes.setEvidence("assist", assist);
 		voterBayes.calcMargin();
-		double margin=voterBayes.getMarginalProbability("user_s","human");
+		double margin=voterBayes.getMarginalProbability("voter","human");
 		changeTrust(agent,margin,threshold,false);
 	}
 	public void setShowConsoleLog(boolean isShowConsoleLog){

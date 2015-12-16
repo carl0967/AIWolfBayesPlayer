@@ -31,8 +31,8 @@ import com.carlo.lib.CauseOfDeath;
  */
 public class BayesVillager extends AbstractVillager {
 	
-	private AgentInformationManager agentInfo;
-	private TrustListManager trustListManager;
+	protected AgentInformationManager agentInfo;
+	protected TrustListManager trustListManager;
 	@Override
 	public void initialize(GameInfo gameInfo,GameSetting gameSetting){
 		super.initialize(gameInfo, gameSetting);
@@ -57,6 +57,7 @@ public class BayesVillager extends AbstractVillager {
 
 	@Override
 	public void finish() {
+		trustListManager.printTrustListForCreatingData(getLatestDayGameInfo());
 		trustListManager.printTrustList(getLatestDayGameInfo());
 	}
 
@@ -67,6 +68,7 @@ public class BayesVillager extends AbstractVillager {
 
 	@Override
 	public Agent vote() {
+		//if(getDay()<3) return trustListManager.getRoleCOAgent(TrustLevel.LOWEST, null, true);
 		return trustListManager.getAgent(TrustLevel.LOWEST, true);
 	}
 	

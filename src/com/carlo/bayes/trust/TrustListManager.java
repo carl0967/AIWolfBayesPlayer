@@ -2,6 +2,7 @@ package com.carlo.bayes.trust;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.aiwolf.client.base.player.AbstractRole;
 import org.aiwolf.client.lib.Utterance;
@@ -38,6 +39,18 @@ public class TrustListManager {
 	}
 	/** AbstractRoleのdayStartの最後に呼ぶ */
 	public void dayStart(){
+		//昨日の投票によって信頼度を上下
+		if(getDay()>1){
+			int yesterday=getDay()-1;
+			Agent executedAgent=agentInfo.getDeadAgent(yesterday,CauseOfDeath.EXECUTED);
+			for(Agent agent:agentInfo.getAgentList(true)){
+				boolean assist= (executedAgent==agentInfo.getVoteTarget(yesterday, agent));
+				trustList.changeVoterTrust(agent, null, yesterday, String.valueOf(assist));
+			}
+			
+		}
+		
+		
 		readTalkNum=0;
 	}
 	/** AbstractRoleのupdateの最後に呼ぶ */
@@ -99,6 +112,13 @@ public class TrustListManager {
 	public void printTrustList(GameInfo finishedGameInfo){
 		if(isShowConsoleLog) trustList.printTrustList(finishedGameInfo);
 	}
+	/** isShowConsoleLogを無視して表示 */
+	public void printTrustListForCreatingData(GameInfo finishedGameInfo){
+		trustList.printTrustListForCreatingData(finishedGameInfo);
+	}
+	private int getDay(){
+		return myRole.getDay();
+	}
 	
 	/**
 	 * 発言を読んで、必要があれば信用度の計算を行う
@@ -129,9 +149,14 @@ public class TrustListManager {
 				if(agentInfo.countCoAgent(Role.MEDIUM)==1){
 					Species inquestedResult=utterance.getResult();
 					//投票結果から計算
-					for(Agent voter:agentInfo.searchVoter(utterance.getTarget())){
-						trustList.changeVoterTrust(voter, utterance.getResult());
+					for(Entry<Agent,Integer> voteEntry : agentInfo.searchVoterMap(utterance.getTarget()).entrySet()) {
+						int voteDay=voteEntry.getValue();
+						Agent voteAgent=voteEntry.getKey();
+						Agent executedAgent=utterance.getTarget();
+						boolean assist= (executedAgent==agentInfo.getVoteTarget(voteDay, voteAgent));
+						trustList.changeVoterTrust(voteEntry.getKey(), utterance.getResult(),voteDay,String.valueOf(assist));
 					}
+					
 					//霊媒先と一致する占い結果を探す
 					for(AbilityResult abilityResult:AIMAssister.searchDivinedAgent(agentInfo, utterance.getTarget())){
 						//まず前回の結果を戻す
