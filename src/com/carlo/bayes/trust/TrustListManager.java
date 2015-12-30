@@ -145,6 +145,10 @@ public class TrustListManager {
 				trustList.changeSeerTrust(seer,day, species, Correct.UNKNOWN);
 				break;
 			case INQUESTED:
+				Agent medium=talk.getAgent();
+				//霊能者のネットワーク計算
+				trustList.changeMediumTrust(medium, utterance.getResult(), talk.getDay());
+				
 				//霊能COが一人だけなら、霊能を真と仮定して各占いとラインが繋がっているかで信用度の計算
 				if(agentInfo.countCoAgent(Role.MEDIUM)==1){
 					Species inquestedResult=utterance.getResult();

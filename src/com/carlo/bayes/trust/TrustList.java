@@ -33,6 +33,7 @@ public class TrustList {
 	private WekaBayesManager seerBayes;
 	private WekaBayesManager voterBayes;
 	private WekaBayesManager attackedBayes;
+	private WekaBayesManager mediumBayes;
 	/**  コンソール出力 */
 	private boolean isShowConsoleLog=false;
 
@@ -41,14 +42,15 @@ public class TrustList {
 		this.agentInfo=agentInfo;
 		for(Agent agent:agents){
 			if(agent==myAgent) continue;
-			//初期値は50
+			//信用度の初期値は50
 			trustMap.put(agent, 50.0);
 		}
 
-		//
+		//ベイズネットワーククラス生成
 		seerBayes=new WekaBayesManager("xml/newseer4.xml");
 		voterBayes=new WekaBayesManager("xml/newvote3_1.xml");
 		attackedBayes=new WekaBayesManager("xml/newattacked1.xml");
+		mediumBayes=new WekaBayesManager("xml/medium3_correct.xml");
 	}
 
 
@@ -119,15 +121,17 @@ public class TrustList {
 		//襲撃されたらattackedネットワークから信用度を計算
 		if(cause==CauseOfDeath.ATTACKED) {
 			if(isShowConsoleLog)  System.out.println("calc trust based on dead:"+deadAgent+day+cause);
-			attackedBayes.clearAllEvidenceWithCalc();
+			attackedBayes.clearAllEvidence();
+			String convertRole=BayesConverter15.convertRole(agentInfo.getCoRole(deadAgent));
+			attackedBayes.setEvidence("corole",convertRole);
+			
+			attackedBayes.calcMargin();
 			//エビデンスがセットされたいない場合の確率を境界とする
 			double threshold=attackedBayes.getMarginalProbability("team", "VILLAGER");
 			
 			attackedBayes.setEvidence("attacked","true");
-			Role deadCoRole=agentInfo.getCoRole(deadAgent);
+			//Role deadCoRole=agentInfo.getCoRole(deadAgent);
 			//nullのことを考えてconvert
-			String convertRole=BayesConverter15.convertRole(deadCoRole);
-			attackedBayes.setEvidence("corole",convertRole);
 			attackedBayes.calcMargin();
 			
 			double margin=attackedBayes.getMarginalProbability("team", "VILLAGER");
@@ -168,8 +172,8 @@ public class TrustList {
 			String label="";
 			if(trustP<25)  label="low";
 			else if(trustP<45) label="little_low";
-			else if(trustP<55) label="middle";
-			else if(trustP<75) label="little_high";
+			else if(trustP<56) label="middle";
+			else if(trustP<76) label="little_high";
 			else label="high";
 			System.out.print(""+label);
 			//System.out.printf(",%.3f",entry.getValue());
@@ -214,6 +218,26 @@ public class TrustList {
 		//信用度の変化
 		changeTrust(agent,margin,threshold,reverse);
 	}
+	/**
+	 *  霊能結果発言から信用度計算
+	 * @param agent
+	 * @param targetSpecies
+	 * @param day
+	 */
+	public void changeMediumTrust(Agent agent,Species targetSpecies,int day){
+		if(!trustMap.containsKey(agent)) return;
+		if(isShowConsoleLog) System.out.println("calc trust based on medium agent:"+agent+"result:"+targetSpecies);
+		mediumBayes.clearAllEvidence();
+		mediumBayes.setEvidence("day",BayesConverter15.convertDay(day));
+		voterBayes.calcMargin();
+		double threshold=mediumBayes.getMarginalProbability("role", "MEDIUM");
+		
+		mediumBayes.setEvidence("result",targetSpecies.toString());
+		mediumBayes.calcMargin();
+		double margin=mediumBayes.getMarginalProbability("role", "MEDIUM");
+		
+		changeTrust(agent,margin,threshold,false);
+	}
 	/** 
 	 *  投票結果から信用度計算
 	 * @param agent 投票者
@@ -225,8 +249,9 @@ public class TrustList {
 	public void changeVoterTrust(Agent agent,Species targetSpecies,int day,String assist){
 		if(!trustMap.containsKey(agent)) return;
 		if(isShowConsoleLog) System.out.println("calc trust based on vote "+agent+"target:"+targetSpecies);
-		voterBayes.clearAllEvidenceWithCalc();
+		voterBayes.clearAllEvidence();
 		voterBayes.setEvidence("day",BayesConverter15.convertDay(day));
+		voterBayes.calcMargin();
 		
 		double threshold=voterBayes.getMarginalProbability("voter","human");
 		if(targetSpecies!=null) voterBayes.setEvidence("target",BayesConverter.convert(targetSpecies));
