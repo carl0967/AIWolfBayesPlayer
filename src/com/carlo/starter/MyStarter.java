@@ -76,6 +76,7 @@ public class MyStarter {
 			}else{
 				werewolfWinNum++;
 			}
+			
 			/*
 			System.out.println("print all role");
 			for(Agent agent:game.getGameData().getAgentList()){

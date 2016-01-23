@@ -5,7 +5,7 @@ import org.aiwolf.common.data.Role;
 import com.carlo.bayes.trust.Correct;
 
 /**
- * AIWolfMarkで生成したログとBayesValueのコンバート
+ * AIWolfMarkで生成したログとBayesネットワークで使うバリューのコンバート
  * 15人用
  * @author carlo
  *

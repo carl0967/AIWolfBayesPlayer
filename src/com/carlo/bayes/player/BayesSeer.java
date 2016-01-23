@@ -10,7 +10,6 @@ import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
-import com.carlo.bayes.trust.DataCorrecter;
 import com.carlo.bayes.trust.TrustLevel;
 import com.carlo.bayes.trust.TrustListManager;
 import com.carlo.lib.AgentInformationManager;
@@ -63,11 +62,6 @@ private int readTalkNum=0;
 	@Override
 	public Agent divine() {
 		return trustListManager.getAgent(TrustLevel.LOWEST, true);
-	}
-	/** 性能テスト用 */
-	public int getCorrectNum(){
-		DataCorrecter dataCorrecter=new DataCorrecter(getMe());
-		return dataCorrecter.start(trustListManager.getSortedAgentList(false), getLatestDayGameInfo());
 	}
 	private void readTalkList(){
 		List<Talk> talkList=this.getLatestDayGameInfo().getTalkList();

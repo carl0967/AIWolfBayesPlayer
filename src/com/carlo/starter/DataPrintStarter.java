@@ -47,9 +47,18 @@ public class DataPrintStarter {
 	/**
 	 * 1回の実行で行うゲーム数
 	 */
-	static protected int GAME_NUM = 1000;
+	 //static protected int GAME_NUM = 2000;
 
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+		
+		int gameNum=1;
+		String fileName="result24.arff";
+		if(args.length>0){
+			//第一引数：試行回数
+			 gameNum=Integer.parseInt(args[0]);
+			 fileName=args[1];
+		}
+		
 		//村人側勝利数
 		int villagerWinNum = 0;
 		//人狼側勝利数
@@ -71,15 +80,28 @@ public class DataPrintStarter {
 		classes.add(Class.forName("jp.ac.shibaura_it.ma15082.WasabiRoleAssignPlayer"));
 		classes.add(Class.forName("takata.player.TakataRoleAssignPlayer"));
 		classes.add(Class.forName("ipa.myAgent.IPARoleAssignPlayer"));
-		//classes.add(Class.forName(className));
+		classes.add(Class.forName("org.aiwolf.iace10442.ChipRoleAssignPlayer"));
+		classes.add(Class.forName("kainoueAgent.MyRoleAssignPlayer"));
+		classes.add(Class.forName("com.github.haretaro.pingwo.role.PingwoRoleAssignPlayer"));
+		classes.add(Class.forName("com.gmail.the.seventh.layers.RoleAssignPlayer"));
+		classes.add(Class.forName("jp.ac.cu.hiroshima.info.cm.nakamura.player.NoriRoleAssignPlayer"));
 		
 		
 		//ファイル出力
-		PrintStream out = new PrintStream("result10.arff");
+		PrintStream out = new PrintStream(fileName);
         //置き換える
         System.setOut(out);
+        
+        //arffのヘッダー部分
+        System.out.println("@RELATION result12\n"+
+        		"@ATTRIBUTE trust {low,little_low,middle,little_high,high}\n"+
+        		"@ATTRIBUTE co {null,VILLAGER,BODYGUARD,WEREWOLF,POSSESSED,SEER,MEDIUM}\n"+
+        		"@ATTRIBUTE role {VILLAGER,BODYGUARD,WEREWOLF,POSSESSED,SEER,MEDIUM}\n"+
+        		"@ATTRIBUTE seerCO {0,1,2,3,4,5}\n"+
+        		"@ATTRIBUTE mediumCO {0,1,2,3,4}\n"+
+        		"@DATA");
 
-		for(int i = 0;i<GAME_NUM;i++){
+		for(int i = 0;i<gameNum;i++){
 			Map<Player, Role> playerMap = new HashMap<Player, Role>();
 			
 			for(int j=0;j<PLAYER_NUM-1;j++){
@@ -109,14 +131,7 @@ public class DataPrintStarter {
 
 			game.setRand(new Random(gameSetting.getRandomSeed()));
 			game.start();
-
-			//int tmpCorrect=myPlayer.getCorrectNum();
-			int tmpCorrect=0;
-			if(tmpCorrect!=-1){
-				correct+=tmpCorrect;
-				max+=3;
-			}
-
+			
 			if(game.getWinner() == Team.VILLAGER){
 				villagerWinNum++;
 			}else{

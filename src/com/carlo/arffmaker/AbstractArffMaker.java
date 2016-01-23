@@ -6,7 +6,13 @@ import java.util.ArrayList;
 
 import jp.halfmoon.inaba.aiwolf.log.GameLog;
 import jp.halfmoon.inaba.aiwolf.log.LogReader;
-
+/**
+ *  arffファイルを作るクラス
+ *  具象クラスで何を出力するかを決定して、bufferに入れていく
+ * 　最終的にそのbufferをarffに出力する
+ * @author carlo
+ *
+ */
 public abstract class AbstractArffMaker {
 	/** 出力を保持 */
 	protected String buffer="";

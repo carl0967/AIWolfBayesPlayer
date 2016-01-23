@@ -10,16 +10,10 @@ import org.aiwolf.client.base.player.AbstractVillager;
 import org.aiwolf.client.lib.TemplateTalkFactory;
 import org.aiwolf.client.lib.Utterance;
 import org.aiwolf.common.data.Agent;
-import org.aiwolf.common.data.Judge;
 import org.aiwolf.common.data.Role;
-import org.aiwolf.common.data.Species;
-import org.aiwolf.common.data.Status;
-import org.aiwolf.common.data.Talk;
-import org.aiwolf.common.data.Vote;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
-import com.carlo.bayes.trust.DataCorrecter;
 import com.carlo.bayes.trust.TrustLevel;
 import com.carlo.bayes.trust.TrustListManager;
 import com.carlo.lib.AgentInformationManager;
@@ -41,18 +35,27 @@ public class BayesVillager extends AbstractVillager {
 	}
 	@Override
 	public void update(GameInfo gameInfo){
+		//long start = System.currentTimeMillis();
+
 		super.update(gameInfo);
 		agentInfo.update(gameInfo);
 		trustListManager.update();
-		
+
+		//long stop = System.currentTimeMillis();
+		//if(stop - start>50) System.out.println("update 実行にかかった時間は " + (stop - start) + " ミリ秒です。");
+
 	}
 
 	@Override
 	public void dayStart() {
+		//long start = System.currentTimeMillis();
+		
 		agentInfo.dayStart();
 		trustListManager.dayStart();
 		trustListManager.printTrustList();
 		
+		//long stop = System.currentTimeMillis();
+		//if(stop - start>50) System.out.println("daystart 実行にかかった時間は " + (stop - start) + " ミリ秒です。");
 	}
 
 	@Override
@@ -72,12 +75,7 @@ public class BayesVillager extends AbstractVillager {
 	public Agent vote() {
 		//if(getDay()<3) return trustListManager.getRoleCOAgent(TrustLevel.LOWEST, null, true);
 		return trustListManager.getAgent(TrustLevel.LOWEST, true);
-	}
-	
-	/** 性能テスト用 */
-	public int getCorrectNum(){
-		DataCorrecter dataCorrecter=new DataCorrecter(getMe());
-		return dataCorrecter.start(trustListManager.getSortedAgentList(false), getLatestDayGameInfo());
+		
 	}
 
 

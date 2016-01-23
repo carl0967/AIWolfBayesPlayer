@@ -45,6 +45,7 @@ public class TrustList {
 			//信用度の初期値は50
 			trustMap.put(agent, 50.0);
 		}
+		
 
 		//ベイズネットワーククラス生成
 		seerBayes=new WekaBayesManager("xml/newseer4.xml");

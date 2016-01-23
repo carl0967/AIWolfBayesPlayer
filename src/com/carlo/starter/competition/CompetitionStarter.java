@@ -70,6 +70,7 @@ public class CompetitionStarter {
 		
 		//game 
 		for(int i = 0;i<gameNum;i++){
+			if(i%1000==0) System.out.println(i);
 			//roleListをシャッフル(役職を変えるため) NOTE:ランダムじゃなくて、各エージェントが同じ回数役職をやるように操作したほうがいい？
 			Collections.shuffle(roleList);
 			Map<Player, Role> playerMap = new HashMap<Player, Role>();
@@ -244,11 +245,12 @@ public class CompetitionStarter {
 		//starter.addClass(Class.forName("jp.ac.cu.hiroshima.inaba.agent.InabaAgent"),"chime"); //ログ
 		
 		System.out.println(starter.getPlayerNum()+"人");
-		starter.gameStart(false,isSaveGameLog);
+		starter.gameStart(true,isSaveGameLog);
 		//結果をコンソールログで表示
 		starter.printwinLoseCounterMap();
 		//CSVファイルを生成
 		starter.writeToCSVFile();
+	
 	}
 
 }

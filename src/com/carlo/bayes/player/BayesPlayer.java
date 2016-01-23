@@ -24,13 +24,5 @@ public class BayesPlayer extends AbstractRoleAssignPlayer {
 	public String getName() {
 		return "Bayes Player";
 	}
-	
-	//性能テスト用。普通の動作とは関係がない。
-	public int getCorrectNum(){
-		if(getVillagerPlayer().getClass()==BayesVillager.class){
-			return ((BayesVillager)getVillagerPlayer()).getCorrectNum();
-		}
-		else return -1;
-	}
 
 }

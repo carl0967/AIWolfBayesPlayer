@@ -13,7 +13,7 @@ import jp.halfmoon.inaba.aiwolf.log.StatusLog;
 import jp.halfmoon.inaba.aiwolf.log.TalkLog;
 
 /**
- * 霊能者の評価用
+ * 霊能者評価ネットワーク
  * 結局使えそうにないから使わないけれど
  * @author carlo
  *

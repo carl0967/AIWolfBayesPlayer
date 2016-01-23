@@ -25,14 +25,14 @@ import org.aiwolf.common.net.GameInfo;
 public class AgentInformationManager {
 	private GameInfo gameInfo;
 	/** 自分を除く各エージェントがCOした役職 */
-	private HashMap<Agent,Role> coRoleMap=new HashMap<Agent,Role>();
+	protected HashMap<Agent,Role> coRoleMap=new HashMap<Agent,Role>();
 	/** エージェントの死亡日,死因マップ */
-	private HashMap<Integer,HashMap<CauseOfDeath,Agent>> deadAgentMap=new HashMap<Integer,HashMap<CauseOfDeath,Agent>>();
+	protected HashMap<Integer,HashMap<CauseOfDeath,Agent>> deadAgentMap=new HashMap<Integer,HashMap<CauseOfDeath,Agent>>();
 	/** 各エージェントが発言した能力結果のリストのマップ */
-	private HashMap<Agent,AbilityResultList> abilityResultListMap=new HashMap<Agent,AbilityResultList>();
+	protected HashMap<Agent,AbilityResultList> abilityResultListMap=new HashMap<Agent,AbilityResultList>();
 	/** 各投票日ごとの投票リスト index:1が1日目の投票リスト。*/
-	private ArrayList<List<Vote>> voteLists=new ArrayList<List<Vote>>();
-	private int readTalkNum;
+	protected ArrayList<List<Vote>> voteLists=new ArrayList<List<Vote>>();
+	protected int readTalkNum;
 	
 	private Agent myAgent;
 	
@@ -44,7 +44,13 @@ public class AgentInformationManager {
 			if(agent==myAgent) continue;
 			coRoleMap.put(agent,null);
 		}
-		
+	}
+	/** 使わないでください */
+	public AgentInformationManager(ArrayList<Agent> agentList){
+		for(Agent agent:agentList){
+			abilityResultListMap.put(agent, new AbilityResultList());
+			coRoleMap.put(agent,null);
+		}
 	}
 	public void update(GameInfo gameInfo){
 		this.gameInfo=gameInfo;
@@ -207,8 +213,8 @@ public class AgentInformationManager {
 	}
 	/**
 	 * 発言を読んで、情報を格納
-	 * COをしていなくても、能力結果発言を元にCO役職を入れる。
-	 * 複数COは対応していない
+	 * COをしていなくても、能力結果発言をしていればその役職をCOしたとみなす
+	 * 複数COは対応していない（最初のCOのみ）
 	 */
 	private void readTalkList(){
 		List<Talk> talkList=gameInfo.getTalkList();

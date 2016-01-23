@@ -24,18 +24,24 @@ import com.carlo.lib.CauseOfDeath;
  *
  */
 public class TrustListManager {
-	private TrustList trustList;
-	private AgentInformationManager agentInfo;
+	protected TrustList trustList;
+	protected AgentInformationManager agentInfo;
 	private AbstractRole myRole;
-	private int readTalkNum=0;
+	protected int readTalkNum=0;
 	
 	/**  コンソール出力。この設定がTrustListにも反映される。on,offはここでいじる。 */
-	private boolean isShowConsoleLog=false;
+	protected boolean isShowConsoleLog=false;
 	public TrustListManager(List<Agent> agentList,AbstractRole myRole,AgentInformationManager agentInfo){
 		this.agentInfo=agentInfo;
 		this.myRole=myRole;
 		trustList=new TrustList(agentList,myRole.getMe(),agentInfo);
 		trustList.setShowConsoleLog(isShowConsoleLog);
+	}
+	/** 使わない(forLog用) */
+	public TrustListManager(List<Agent> agentList,Agent myAgent,AgentInformationManager agentInfo){
+		this.agentInfo=agentInfo;
+		trustList=new TrustList(agentList,myAgent,agentInfo);
+		trustList.setShowConsoleLog(false);
 	}
 	/** AbstractRoleのdayStartの最後に呼ぶ */
 	public void dayStart(){
@@ -105,25 +111,31 @@ public class TrustListManager {
 	}
 	
 
-	
+	/**
+	 *  trustListManagerの isShowConsoleLog がtrueの場合のみログ出力を行う
+	 */
 	public void printTrustList(){
 		if(isShowConsoleLog) trustList.printTrustList();
 	}
 	public void printTrustList(GameInfo finishedGameInfo){
 		if(isShowConsoleLog) trustList.printTrustList(finishedGameInfo);
 	}
+	public void setShowConsoleLog(boolean isShowConsoleLog){
+		this.isShowConsoleLog=isShowConsoleLog;
+		trustList.setShowConsoleLog(isShowConsoleLog);
+	}
 	/** isShowConsoleLogを無視して表示 */
 	public void printTrustListForCreatingData(GameInfo finishedGameInfo){
 		trustList.printTrustListForCreatingData(finishedGameInfo);
 	}
-	private int getDay(){
+	protected int getDay(){
 		return myRole.getDay();
 	}
 	
 	/**
 	 * 発言を読んで、必要があれば信用度の計算を行う
 	 */
-	private void readTalkList(){
+	protected void readTalkList(){
 		List<Talk> talkList=myRole.getLatestDayGameInfo().getTalkList();
 		for(int i=readTalkNum;i<talkList.size();i++){
 			Talk talk=talkList.get(i);

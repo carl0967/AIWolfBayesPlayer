@@ -23,7 +23,7 @@ public class VoterArffMaker extends AbstractArffMaker{
 	@Override
 	public String[] getAttributeNames(){
 		ArffValueGetter getter=new ArffValueGetter();
-		return new String[] {"day "+getter.getDay(),"voter "+getter.getRole(),"target "+getter.getRole(),"assist "+getter.getBoolean()};
+		return new String[] {"day "+getter.getDay(),"voter "+getter.getSpecies(),"target "+getter.getSpecies(),"assist "+getter.getBoolean()};
 	}
 	protected void readGameLog(GameLog log) {
 		for (Entry<Integer, DayLog> entry : log.getDays().entrySet()) {
@@ -41,7 +41,7 @@ public class VoterArffMaker extends AbstractArffMaker{
 				boolean isVoteExecutedMan = executeLog.getExecuteAgentNo()==targetStatus.getAgentNo();
 				
 				//System.out.println(day+","+agentStatus.getAgentNo()+","+ agentStatus.getRole()  +","+targetStatus.getAgentNo()+","+targetStatus.getRole() +","+isVoteExecutedMan);
-				String str= BayesConverter15.convertDay(day)+","+ BayesConverter15.convertRoleToSpecies(agentStatus.getRole())  +","+ BayesConverter15.convertRoleToSpecies(targetStatus.getRole()) +","+isVoteExecutedMan;
+				String str= BayesConverter15.convertDay(day)+","+ agentStatus.getRole().getSpecies()  +","+ targetStatus.getRole().getSpecies() +","+isVoteExecutedMan;
 				buffer+=str+"\n";
 			}
 		}
@@ -51,11 +51,14 @@ public class VoterArffMaker extends AbstractArffMaker{
 
 		VoterArffMaker maker = new VoterArffMaker();
 
-		for( int i = 1; i <= 50; i++ ){
-			maker.exec("./logs/log1209/log/aiwolf" + i + ".log");
-			
+		for( int i = 1; i <= 3; i++ ){
+			for(int j=1;j<=1000;j++){
+				maker.exec("./logs/comp_data/log"+i+"/aiwolf" + j + ".log");
+			}
+
 		}
-		maker.printBufferToFile("newvote3.arff");;
+		maker.printBufferToFile("newvote5.arff");
+		
 	}
 
 }
