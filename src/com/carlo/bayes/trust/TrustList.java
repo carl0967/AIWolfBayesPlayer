@@ -114,14 +114,13 @@ public class TrustList {
 	/**
 	 * 死亡情報から信用度計算
 	 * @param deadAgent 死んだエージェント
-	 * @param cause 死因
-	 * @param day 死んだ日にち
+	 * @param cause 死因(死んだかどうか)
 	 */
-	public void deadAgent(Agent deadAgent,CauseOfDeath cause,int day){
+	public void changeDeadAgent(Agent deadAgent,CauseOfDeath cause){
 		if(!trustMap.containsKey(deadAgent)) return;
 		//襲撃されたらattackedネットワークから信用度を計算
 		if(cause==CauseOfDeath.ATTACKED) {
-			if(isShowConsoleLog)  System.out.println("calc trust based on dead:"+deadAgent+day+cause);
+			if(isShowConsoleLog)  System.out.println("calc trust based on dead:"+deadAgent+" "+" "+cause+" "+agentInfo.getCoRole(deadAgent));
 			attackedBayes.clearAllEvidence();
 			String convertRole=BayesConverter15.convertRole(agentInfo.getCoRole(deadAgent));
 			attackedBayes.setEvidence("corole",convertRole);
@@ -137,6 +136,8 @@ public class TrustList {
 			
 			double margin=attackedBayes.getMarginalProbability("team", "VILLAGER");
 			changeTrust(deadAgent,margin,threshold,false);
+			
+
 		}
 	}
 	public void printTrustList(){

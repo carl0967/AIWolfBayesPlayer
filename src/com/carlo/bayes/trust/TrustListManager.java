@@ -55,7 +55,14 @@ public class TrustListManager {
 			}
 			
 		}
-		
+		//昨日の襲撃によって信用度を上下
+		if(getDay()>1){
+			int yesterday=getDay()-1;
+			Agent attackedAgent=agentInfo.getDeadAgent(yesterday, CauseOfDeath.ATTACKED);
+			if(attackedAgent!=null){
+				trustList.changeDeadAgent(attackedAgent, CauseOfDeath.ATTACKED);
+			}
+		}
 		
 		readTalkNum=0;
 	}
