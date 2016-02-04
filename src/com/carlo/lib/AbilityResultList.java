@@ -39,7 +39,7 @@ public class AbilityResultList {
 			System.out.println(result);
 		}
 	}
-	/** 線形探索するよ */
+	/** resultのtargetが一致するものを探す 線形探索するよ */
 	public AbilityResult getAbilityResut(Agent target){
 		for(AbilityResult result:resultList){
 			if(result.getTarget()==target) return result;

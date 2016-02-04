@@ -3,6 +3,7 @@ package com.carlo.bayes.trust;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.aiwolf.common.data.Agent;
@@ -27,6 +28,7 @@ public class TrustList {
 	/**
 	 * Anget,そのAgentに対する信用度<br>
 	 * 信用度 0~100 高いほど村人陣営だと思っている
+	 * NOTE:上限下限値を伸ばすか、廃止したほうがいいかも？
 	 */
 	private HashMap<Agent,Double> trustMap=new HashMap<Agent,Double>();
 
@@ -36,6 +38,13 @@ public class TrustList {
 	private WekaBayesManager mediumBayes;
 	/**  コンソール出力 */
 	private boolean isShowConsoleLog=false;
+	
+	/** 占いネットワークの計算結果 <br>
+	 * keyは　占いCO者名+発言日+対象   例:Agent[01]2Agent[03] 
+	 *  同じ日に同じ対象を占っても知らない */
+	private HashMap<String,Double> seerTpMap=new HashMap<String,Double>();
+	
+	private HashMap<String,Correct> seerCorrectMap=new HashMap<String,Correct>();
 
 	private AgentInformationManager agentInfo;
 	public TrustList(List<Agent> agents,Agent myAgent,AgentInformationManager agentInfo){
@@ -48,7 +57,8 @@ public class TrustList {
 		
 
 		//ベイズネットワーククラス生成
-		seerBayes=new WekaBayesManager("xml/newseer4.xml");
+		//seerBayes=new WekaBayesManager("xml/newseer4.xml");
+		seerBayes=new WekaBayesManager("xml/new_seer2_6.xml");
 		voterBayes=new WekaBayesManager("xml/newvote3_1.xml");
 		attackedBayes=new WekaBayesManager("xml/newattacked1.xml");
 		mediumBayes=new WekaBayesManager("xml/medium3_correct.xml");
@@ -165,7 +175,8 @@ public class TrustList {
 			System.out.println();
 		}
 	}
-	public void printTrustListForCreatingData(GameInfo finishedGameInfo){
+	/** 結果ネットワークのarffファイル作成用 */
+	public void printTrustListForCreatingData(Map<Agent,Role> roleMap){
 		//System.out.println("\n信用度,CO,役職,占いCO数,霊能CO数");
 		for(Entry<Agent, Double> entry : trustMap.entrySet()) {
 			//System.out.print(entry.getKey()+",");
@@ -180,13 +191,11 @@ public class TrustList {
 			System.out.print(""+label);
 			//System.out.printf(",%.3f",entry.getValue());
 			System.out.print(","+agentInfo.getCoRole(entry.getKey()));
-			System.out.print(","+finishedGameInfo.getRoleMap().get(entry.getKey()));
+			System.out.print(","+roleMap.get(entry.getKey()));
 			System.out.print(","+agentInfo.countCoAgent(Role.SEER));
 			System.out.println(","+agentInfo.countCoAgent(Role.MEDIUM));
 			//System.out.println(","+agentInfo.getDayAgentDied(entry.getKey()));
 		}
-		//System.out.println();
-
 	}
 	/**
 	 *  占い発言から信用度計算
@@ -195,17 +204,26 @@ public class TrustList {
 	 * @param species 占い結果
 	 * @param correct 占い結果が合ってたかどうか
 	 */
-	public void changeSeerTrust(Agent agent,int day,Species species,Correct correct){
-		changeSeerTrust(agent,day,species,correct,false);
+	public void changeSeerTrust(Agent agent,int day,Species species,Correct correct,Agent target,Correct attacked){
+		changeSeerTrust(agent,day,species,correct,false,target,attacked);
 	}
 	/**
 	 * @param reverse 逆の計算をするかどうか。通常はfalse
 	 */
-	public void changeSeerTrust(Agent agent,int day,Species species,Correct correct,boolean reverse){
+	public void changeSeerTrust(Agent agent,int day,Species species,Correct correct,boolean reverse,Agent target,Correct attacked){
 		if(isShowConsoleLog)  System.out.print("calc trust based on seer:");
-		if(isShowConsoleLog) System.out.println(agent+" day:"+day+" species:"+species+" correct:"+correct+" reverse:"+reverse);
+		if(isShowConsoleLog) System.out.println(agent+"target:"+target+" day:"+day+" species:"+species+" correct:"+correct+" reverse:"+reverse);
+		
 		
 		if(!trustMap.containsKey(agent)) return;
+		
+		//追加 reverseかつ以前計算したものがあれば
+		if(reverse && seerTpMap.containsKey(agent+""+day+target)){
+			addTrust(agent,-seerTpMap.get(agent+""+day+target));
+			if(isShowConsoleLog) System.out.println("前回の計算結果分戻す"+-seerTpMap.get(agent+""+day+target));
+			return;
+		}
+		
 		seerBayes.clearAllEvidence();
 		seerBayes.setEvidence("day", BayesConverter15.convertDay(day));
 		seerBayes.calcMargin();
@@ -214,9 +232,16 @@ public class TrustList {
 		
 		seerBayes.setEvidence("result",species.toString());
 		if(correct!=Correct.UNKNOWN) seerBayes.setEvidence("correct", BayesConverter15.convert(correct));
+		if(attacked!=Correct.UNKNOWN) seerBayes.setEvidence("isAttacked", BayesConverter15.convert(attacked));
 		seerBayes.calcMargin();
 		
 		double margin=seerBayes.getMarginalProbability("role", "SEER");
+		
+		//元に戻す時用にデータ保存
+		if(!reverse) {
+			seerTpMap.put(agent+""+day+target,(margin-threshold)*100);
+			seerCorrectMap.put(agent+""+day+target,correct);
+		}
 		//信用度の変化
 		changeTrust(agent,margin,threshold,reverse);
 	}
@@ -265,6 +290,18 @@ public class TrustList {
 	public void setShowConsoleLog(boolean isShowConsoleLog){
 		this.isShowConsoleLog=isShowConsoleLog;
 	}
+	/**
+	 * keyは seerAgent day targetAgent からなる
+	 *  占い師の結果が当たっていたかどうかが保存されているかを確認
+	 *  保存されていればそれを返す。なければnull。
+	 * @param key
+	 * @return
+	 */
+	public Correct getSeerCorrect(Agent seer,int day,Agent target){
+		String key=seer+""+day+""+target;
+		if(seerCorrectMap.containsKey(key)) return seerCorrectMap.get(key);
+		else return null;
+	}
 
 	/**
 	 * threshold,marginが村人陣営の確率なら、reverseはfalse<br>
@@ -277,6 +314,9 @@ public class TrustList {
 		point=(margin-threshold)*100;
 		double pre=trustMap.get(agent);
 		double result;
+		//事後確率は1%を切るようなら、それは破綻とみなし一気にポイントを下げる
+		if(margin<0.01) point=-100;
+		
 		if(reverse) result=addTrust(agent,-point);
 		else result=addTrust(agent,point);
 		if(isShowConsoleLog){

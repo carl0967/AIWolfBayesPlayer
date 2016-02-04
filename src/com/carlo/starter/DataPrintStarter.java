@@ -41,6 +41,8 @@ public class DataPrintStarter {
 	 * 参加エージェントの数
 	 * 大会は15
 	 * 10人で全役職あり
+	 * 
+	 * 結果ネットワーク生成に使ってる
 	 */
 	static protected int PLAYER_NUM = 15;
 
@@ -51,8 +53,9 @@ public class DataPrintStarter {
 
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 		
+		
 		int gameNum=1;
-		String fileName="result24.arff";
+		String fileName="result72.arff";
 		if(args.length>0){
 			//第一引数：試行回数
 			 gameNum=Integer.parseInt(args[0]);
@@ -88,9 +91,9 @@ public class DataPrintStarter {
 		
 		
 		//ファイル出力
-		PrintStream out = new PrintStream(fileName);
+		//PrintStream out = new PrintStream(fileName);
         //置き換える
-        System.setOut(out);
+       // System.setOut(out);
         
         //arffのヘッダー部分
         System.out.println("@RELATION result12\n"+

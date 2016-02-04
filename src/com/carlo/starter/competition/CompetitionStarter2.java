@@ -29,7 +29,7 @@ import org.aiwolf.server.util.FileGameLogger;
 import com.gmail.jinro.noppo.players.RoleAssignPlayer;
 import com.yy.player.YYRoleAssignPlayer;
 
-public class CompetitionStarter {
+public class CompetitionStarter2 {
 	/** 何回ゲームをするか */
 	private  int gameNum = 1;
 	ArrayList<Class> playerClasses=new ArrayList<Class>();
@@ -38,7 +38,7 @@ public class CompetitionStarter {
 	/**
 	 * @param gameNum 試合回数
 	 */
-	public CompetitionStarter(int gameNum){
+	public CompetitionStarter2(int gameNum){
 		this.gameNum=gameNum;
 		winLoseCounterMap=new LinkedHashMap<Class,RoleWinLoseCounter>();
 		
@@ -216,9 +216,9 @@ public class CompetitionStarter {
 		//ゲームの経過をコンソールで表示するか
 		boolean isShowConsoleLog=false;
 		
-		// コマンドライン引数で、動作を変えることもできます。
+		// 実行時引数で、動作を変えることもできます。
 		// 例 -n 100 -l -s	:ゲーム試行回数100回、ゲームログを保存、コンソールログを表示
-		// 例　-n 10		:ゲーム試行回数10回、ゲームログを保存しない、コンソールログを表示しない
+		// 例　-n 100		:ゲーム試行回数100回、ゲームログを保存しない、コンソールログを表示しない
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith("-")) {
 				if (args[i].equals("-n")) {
@@ -234,28 +234,30 @@ public class CompetitionStarter {
 			}
 		}
 		
-		CompetitionStarter starter=new CompetitionStarter(gameNum);
+		CompetitionStarter2 starter=new CompetitionStarter2(gameNum);
 		
 		//プレイヤークラスの追加
 		starter.addClass(Class.forName("org.aiwolf.client.base.smpl.SampleRoleAssignPlayer"),"サンプル");
+		//starter.addClass(Class.forName("com.carlo.random.player.RandomPlayer"), "ランダム");
 		starter.addClass(Class.forName("com.yy.player.YYRoleAssignPlayer"),"YY");
 		starter.addClass(Class.forName("jp.halfmoon.inaba.aiwolf.strategyplayer.StrategyPlayer"),"饂飩"); 
 		starter.addClass(Class.forName("org.aiwolf.kajiClient.LearningPlayer.KajiRoleAssignPlayer"));
 		starter.addClass(Class.forName("com.gmail.jinro.noppo.players.RoleAssignPlayer"),"働きの悪"); 
 		starter.addClass(Class.forName("org.aiwolf.Satsuki.LearningPlayer.AIWolfMain"),"Satuki"); 
 		starter.addClass(Class.forName("jp.ac.shibaura_it.ma15082.WasabiRoleAssignPlayer"),"Wasabi"); 
+		starter.addClass(Class.forName("com.carlo.bayes.player.BayesPlayer"),"Bayes");
 		starter.addClass(Class.forName("takata.player.TakataRoleAssignPlayer"),"GofukuLab");
 		starter.addClass(Class.forName("ipa.myAgent.IPARoleAssignPlayer"),"IPA");
 		starter.addClass(Class.forName("org.aiwolf.iace10442.ChipRoleAssignPlayer"),"iace10442"); 
 		starter.addClass(Class.forName("kainoueAgent.MyRoleAssignPlayer"),"swingby"); //swingby
-		//starter.addClass(Class.forName("jp.ac.aitech.k13009kk.aiwolf.client.player.AndoRoleAssignPlayer")); 
+		//starter.addClass(Class.forName("jp.ac.aitech.k13009kk.aiwolf.client.player.AndoRoleAssignPlayer")); //itolab //ログ出力
 		starter.addClass(Class.forName("com.github.haretaro.pingwo.role.PingwoRoleAssignPlayer"),"平兀"); 
 		starter.addClass(Class.forName("com.gmail.the.seventh.layers.RoleAssignPlayer"),"Fenrir"); 
 		
 		starter.addClass(Class.forName("jp.ac.cu.hiroshima.info.cm.nakamura.player.NoriRoleAssignPlayer"),"中村人");
-		starter.addClass(Class.forName("com.gmail.octobersky.MyRoleAssignPlayer"),"昼休み"); 
-		//starter.addClass(Class.forName("com.canvassoft.Agent.CanvasRoleAssignPlayer")); //CanvasSoft 
-		//starter.addClass(Class.forName("jp.ac.cu.hiroshima.inaba.agent.InabaAgent"),"chime"); 
+		//starter.addClass(Class.forName("com.gmail.octobersky.MyRoleAssignPlayer"),"昼休み"); //ログ
+		//starter.addClass(Class.forName("com.canvassoft.Agent.CanvasRoleAssignPlayer")); //CanvasSoft //ログ
+		//starter.addClass(Class.forName("jp.ac.cu.hiroshima.inaba.agent.InabaAgent"),"chime"); //ログ
 		
 		System.out.println(starter.getPlayerNum()+"人で"+gameNum+"回ゲームを行います。");
 		starter.gameStart(isShowConsoleLog,isSaveLog);

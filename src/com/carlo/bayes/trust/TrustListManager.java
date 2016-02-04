@@ -47,12 +47,14 @@ public class TrustListManager {
 	public void dayStart(){
 		//昨日の投票によって信頼度を上下
 		if(getDay()>1){
+			/*
 			int yesterday=getDay()-1;
 			Agent executedAgent=agentInfo.getDeadAgent(yesterday,CauseOfDeath.EXECUTED);
 			for(Agent agent:agentInfo.getAgentList(true)){
 				boolean assist= (executedAgent==agentInfo.getVoteTarget(yesterday, agent));
 				trustList.changeVoterTrust(agent, null, yesterday, String.valueOf(assist));
 			}
+			*/
 			
 		}
 		//昨日の襲撃によって信用度を上下
@@ -61,6 +63,27 @@ public class TrustListManager {
 			Agent attackedAgent=agentInfo.getDeadAgent(yesterday, CauseOfDeath.ATTACKED);
 			if(attackedAgent!=null){
 				trustList.changeDeadAgent(attackedAgent, CauseOfDeath.ATTACKED);
+			}
+			//System.out.println("襲撃"+attackedAgent+" day:"+yesterday);
+			//襲撃された人物を占っていた占いCO者がいた場合、その計算
+			for(AbilityResult abilityResult:AIMAssister.searchDivinedAgent(agentInfo,attackedAgent)){
+				Agent seer=abilityResult.getAgent();
+				Agent target=abilityResult.getTarget();
+				int day=abilityResult.getDay();
+				
+				if(isShowConsoleLog) System.out.println("占い先死亡 seer:"+seer+" target:"+target+" day"+day);
+				Correct correct=Correct.UNKNOWN;
+				Correct preCorrect=trustList.getSeerCorrect(seer,day,target);
+				if(preCorrect!=null) correct=preCorrect;
+				
+				//まず前回の結果を戻す
+				if(isShowConsoleLog) System.out.println("back trust ");
+				trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getTalkedDay(), abilityResult.getSpecies(), correct,true,target,Correct.UNKNOWN);
+				
+
+				
+				if(isShowConsoleLog) System.out.println("recalc trust ");
+				trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getTalkedDay(), abilityResult.getSpecies(), correct,target,Correct.YES);
 			}
 		}
 		
@@ -133,7 +156,7 @@ public class TrustListManager {
 	}
 	/** isShowConsoleLogを無視して表示 */
 	public void printTrustListForCreatingData(GameInfo finishedGameInfo){
-		trustList.printTrustListForCreatingData(finishedGameInfo);
+		trustList.printTrustListForCreatingData(finishedGameInfo.getRoleMap());
 	}
 	protected int getDay(){
 		return myRole.getDay();
@@ -161,7 +184,7 @@ public class TrustListManager {
 				int day=talk.getDay();
 				Species species=utterance.getResult();
 				
-				trustList.changeSeerTrust(seer,day, species, Correct.UNKNOWN);
+				trustList.changeSeerTrust(seer,day, species, Correct.UNKNOWN,utterance.getTarget(),Correct.UNKNOWN);
 				break;
 			case INQUESTED:
 				Agent medium=talk.getAgent();
@@ -183,9 +206,8 @@ public class TrustListManager {
 					//霊媒先と一致する占い結果を探す
 					for(AbilityResult abilityResult:AIMAssister.searchDivinedAgent(agentInfo, utterance.getTarget())){
 						//まず前回の結果を戻す
-						
 						if(isShowConsoleLog) System.out.println("back trust ");
-						trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getTalkedDay(), abilityResult.getSpecies(), Correct.UNKNOWN,true);
+						trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getTalkedDay(), abilityResult.getSpecies(), Correct.UNKNOWN,true,utterance.getTarget(),Correct.UNKNOWN);
 						
 						//判明した結果を入れて計算
 						Correct correct=Correct.UNKNOWN;
@@ -193,7 +215,7 @@ public class TrustListManager {
 						else correct=Correct.NO;
 						
 						if(isShowConsoleLog) System.out.println("recalc trust ");
-						trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getTalkedDay(), abilityResult.getSpecies(), correct);
+						trustList.changeSeerTrust(abilityResult.getAgent(),abilityResult.getTalkedDay(), abilityResult.getSpecies(), correct,utterance.getTarget(),Correct.UNKNOWN);
 						
 					}
 				}

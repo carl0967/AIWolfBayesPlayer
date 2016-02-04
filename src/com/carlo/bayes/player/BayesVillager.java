@@ -40,6 +40,9 @@ public class BayesVillager extends AbstractVillager {
 		super.update(gameInfo);
 		agentInfo.update(gameInfo);
 		trustListManager.update();
+		
+
+		
 
 		//long stop = System.currentTimeMillis();
 		//if(stop - start>50) System.out.println("update 実行にかかった時間は " + (stop - start) + " ミリ秒です。");
@@ -54,6 +57,7 @@ public class BayesVillager extends AbstractVillager {
 		trustListManager.dayStart();
 		trustListManager.printTrustList();
 		
+		
 		//long stop = System.currentTimeMillis();
 		//if(stop - start>50) System.out.println("daystart 実行にかかった時間は " + (stop - start) + " ミリ秒です。");
 	}
@@ -63,7 +67,7 @@ public class BayesVillager extends AbstractVillager {
 		//if(agentInfo.isAlive(getMe())){
 			//trustListManager.printTrustListForCreatingData(getLatestDayGameInfo());
 		//}
-		trustListManager.printTrustList(getLatestDayGameInfo());
+		//trustListManager.printTrustList(getLatestDayGameInfo());
 	}
 
 	@Override

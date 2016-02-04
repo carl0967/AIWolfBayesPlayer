@@ -27,12 +27,12 @@ public class MyStarter {
 	 * 大会は15
 	 * 10人で全役職あり
 	 */
-	static protected int PLAYER_NUM = 10;
+	static protected int PLAYER_NUM = 15;
 
 	/**
 	 * 1回の実行で行うゲーム数
 	 */
-	static protected int GAME_NUM = 1000;
+	static protected int GAME_NUM = 1;
 
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 		//村人側勝利数
@@ -53,7 +53,7 @@ public class MyStarter {
 			GameSetting gameSetting = GameSetting.getDefaultGame(PLAYER_NUM);
 
 			AIWolfGame game = new AIWolfGame(gameSetting, gameServer);
-			game.setShowConsoleLog(false);
+			game.setShowConsoleLog(true);
 			
 			//ログ
 			
