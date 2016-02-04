@@ -23,7 +23,6 @@ import org.aiwolf.server.util.FileGameLogger;
 import org.aiwolf.server.util.GameLogger;
 
 import com.carlo.bayes.player.BayesPlayer;
-import com.carlo.random.player.RandomPlayer;
 import com.yy.player.*;
 
 import jp.halfmoon.inaba.aiwolf.strategyplayer.StrategyPlayer;
