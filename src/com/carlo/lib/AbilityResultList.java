@@ -1,10 +1,10 @@
 package com.carlo.lib;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
-import org.aiwolf.common.data.Judge;
 import org.aiwolf.common.data.Species;
 
 /**
@@ -45,6 +45,17 @@ public class AbilityResultList {
 			if(result.getTarget()==target) return result;
 		}
 		return null;
+	}
+	public List<AbilityResult> getAbilityResut(){
+		return resultList;
+	}
+	/**abilityResultのspeciesが一致するものを探してリストで返す  */
+	public List<AbilityResult> searchAbilityResult(Species species){
+		ArrayList<AbilityResult> list=new ArrayList<AbilityResult>(); 
+		for(AbilityResult result:resultList){
+			if(result.getSpecies()==species) list.add(result);
+		}
+		return list;
 	}
 
 }

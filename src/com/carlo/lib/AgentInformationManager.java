@@ -24,7 +24,7 @@ import org.aiwolf.common.net.GameInfo;
 
 public class AgentInformationManager {
 	private GameInfo gameInfo;
-	/** 自分を除く各エージェントがCOした役職 */
+	/** 自分を含めた各エージェントがCOした役職 */
 	protected HashMap<Agent,Role> coRoleMap=new HashMap<Agent,Role>();
 	/** エージェントの死亡日,死因マップ */
 	protected HashMap<Integer,HashMap<CauseOfDeath,Agent>> deadAgentMap=new HashMap<Integer,HashMap<CauseOfDeath,Agent>>();
@@ -41,7 +41,7 @@ public class AgentInformationManager {
 		this.myAgent=myAgent;
 		for(Agent agent:gameInfo.getAgentList()){
 			abilityResultListMap.put(agent, new AbilityResultList());
-			if(agent==myAgent) continue;
+			//if(agent==myAgent) continue;
 			coRoleMap.put(agent,null);
 		}
 	}
@@ -52,10 +52,12 @@ public class AgentInformationManager {
 			coRoleMap.put(agent,null);
 		}
 	}
+	/** 呼び出し必須 */
 	public void update(GameInfo gameInfo){
 		this.gameInfo=gameInfo;
 		readTalkList();
 	}
+	/** 呼び出し必須 */
 	public void dayStart(){
 		readTalkNum=0;
 		//死亡者リストの追加
@@ -92,7 +94,7 @@ public class AgentInformationManager {
 	 * 
 	 * @param coRole COした役職。nullならCOがない人を対象に。 
 	 * @param isAliveOnly 生存しているエージェントのみを対象とするか
-	 * @return  条件に合うエージェントのリストを返す
+	 * @return  自身を除いた、条件に合うエージェントのリストを返す
 	 */
 	public List<Agent> getCoAgentList(Role coRole,boolean isAliveOnly){
 		ArrayList<Agent> agents=new ArrayList<Agent>();
@@ -104,26 +106,22 @@ public class AgentInformationManager {
 				if(entry.getValue()==coRole) agents.add(entry.getKey());
 			}
 		}
+		agents.remove(myAgent);
 		return agents;
 	}
 	/**
 	 * 
 	 * @param isAliveOnly 生存しているエージェントのみを対象とするか
-	 * @return 条件に合うエージェントのリストを返す
+	 * @return 自身を除いた、条件に合うエージェントのリストを返す
 	 */
 	public List<Agent> getAgentList(boolean isAliveOnly){
-		ArrayList<Agent> agents=new ArrayList<Agent>();
-		for(Entry<Agent, Role> entry : coRoleMap.entrySet()) {
-			if(isAliveOnly){
-				if(isAlive(entry.getKey())) agents.add(entry.getKey());
-			}
-			else{
-				 agents.add(entry.getKey());
-			}
-		}
-		return agents;
+		ArrayList<Agent> agentList=new ArrayList<Agent>();
+		if(isAliveOnly) agentList.addAll(gameInfo.getAliveAgentList());
+		else agentList.addAll(gameInfo.getAgentList());
+		agentList.remove(myAgent);
+		return agentList;
 	}
-	/** 役職roleをCOしたエージェントの数を返す */
+	/** 役職roleをCOしたエージェントの数を返す（自身を含む） */
 	public int countCoAgent(Role role){
 		int count=0;
 		for(Entry<Agent, Role> entry : coRoleMap.entrySet()) {
@@ -135,25 +133,6 @@ public class AgentInformationManager {
 		return myAgent;
 	}
 	
-	public void printDeadAgentMap(){
-		for(int i=0;i<gameInfo.getDay();i++){
-			HashMap<CauseOfDeath,Agent> map=deadAgentMap.get(i);
-			System.out.println(i+"day attacked agent:"+map.get(CauseOfDeath.ATTACKED));
-			System.out.println(i+"day executed agent:"+map.get(CauseOfDeath.EXECUTED));
-		}
-	}
-	public void printCoRoleMap(){
-		for(Entry<Agent, Role> entry : coRoleMap.entrySet()) {
-			System.out.println(entry.getKey()+" "+entry.getValue());
-		}
-	}
-	public void printAbilityResultList(){
-		for(Entry<Agent, AbilityResultList> entry : abilityResultListMap.entrySet()) {
-			System.out.print(entry.getKey());
-			entry.getValue().printList();
-			System.out.println();
-		}
-	}
 	/** agentが生存しているかどうか */
 	public boolean isAlive(Agent agent){
 		if(gameInfo.getStatusMap().get(agent)==Status.ALIVE) return true;
@@ -207,14 +186,44 @@ public class AgentInformationManager {
 	public List<List<Vote>> getVoteLists(){
 		return voteLists;
 	}
+	/** そのagentの能力行使結果をまとめたクラスを返す */
+	public AbilityResultList getAbilityResultList(Agent agent){
+		return abilityResultListMap.get(agent);
+	}
 	
 	public HashMap<Agent,AbilityResultList> getAbilityResultListMap(){
 		return abilityResultListMap;
 	}
+	
+	
+	/** デバッグ用のprintメソッド */
+	
+	public void printDeadAgentMap(){
+		for(int i=0;i<gameInfo.getDay();i++){
+			HashMap<CauseOfDeath,Agent> map=deadAgentMap.get(i);
+			System.out.println(i+"day attacked agent:"+map.get(CauseOfDeath.ATTACKED));
+			System.out.println(i+"day executed agent:"+map.get(CauseOfDeath.EXECUTED));
+		}
+	}
+	public void printCoRoleMap(){
+		for(Entry<Agent, Role> entry : coRoleMap.entrySet()) {
+			System.out.println(entry.getKey()+" "+entry.getValue());
+		}
+	}
+	public void printAbilityResultList(){
+		for(Entry<Agent, AbilityResultList> entry : abilityResultListMap.entrySet()) {
+			System.out.print(entry.getKey());
+			entry.getValue().printList();
+			System.out.println();
+		}
+	}
+	
+	
 	/**
 	 * 発言を読んで、情報を格納
 	 * COをしていなくても、能力結果発言をしていればその役職をCOしたとみなす
-	 * 複数COは対応していない（最初のCOのみ）
+	 * 複数COは対応していない（最初のCOのみ受理）
+	 * 村人COは無視
 	 */
 	private void readTalkList(){
 		List<Talk> talkList=gameInfo.getTalkList();
@@ -225,18 +234,19 @@ public class AgentInformationManager {
 			Agent speaker=talk.getAgent();
 			switch (utterance.getTopic()){
 			case COMINGOUT:
-				coRoleMap.put(speaker,utterance.getRole());
+				//村人COは聞かない
+				if(coRoleMap.containsKey(speaker) && utterance.getRole()!=Role.VILLAGER) coRoleMap.put(speaker,utterance.getRole());
 				break;
 			case DIVINED:
-				if(coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.SEER);
+				if(coRoleMap.containsKey(speaker) && coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.SEER);
 				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1,talk.getDay(), speaker,utterance.getTarget(),utterance.getResult());
 				break;
 			case INQUESTED:
-				if(coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.MEDIUM);
+				if(coRoleMap.containsKey(speaker) && coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.MEDIUM);
 				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1,talk.getDay(), speaker,utterance.getTarget(),utterance.getResult());
 				break;
 			case GUARDED:
-				if(coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.BODYGUARD);
+				if(coRoleMap.containsKey(speaker) && coRoleMap.get(speaker)==null) coRoleMap.put(speaker, Role.BODYGUARD);
 				abilityResultListMap.get(speaker).addAbilityResult(utterance.getTopic(), -1,talk.getDay(),speaker,utterance.getTarget(),utterance.getResult());
 				break;
 			default:

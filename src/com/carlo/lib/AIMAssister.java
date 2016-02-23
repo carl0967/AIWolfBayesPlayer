@@ -13,6 +13,12 @@ import org.aiwolf.common.data.Role;
  *
  */
 public class AIMAssister {
+	/**
+	 *  たまに1msくらいかかる
+	 * @param aim
+	 * @param target
+	 * @return
+	 */
 	static public List<AbilityResult> searchDivinedAgent(AgentInformationManager aim,Agent target){
 		ArrayList<AbilityResult> abilityResults=new ArrayList<AbilityResult>();
 
